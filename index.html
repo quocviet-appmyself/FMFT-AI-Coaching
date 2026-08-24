@@ -124,7 +124,6 @@
             align-items: center;
         }
 
-        /* Public Dynamic Todo List */
         .daily-greeting {
             font-size: 12px;
             color: var(--text-muted);
@@ -192,7 +191,6 @@
             cursor: pointer;
         }
 
-        /* Private Dynamic Strategy & Multi-layer Planning */
         .hierarchy-box {
             background: #F9F9F9;
             border: 1px dashed var(--accent-gold);
@@ -275,7 +273,6 @@
             font-size: 11px;
         }
 
-        /* Bottom Nav */
         nav.bottom-nav {
             background: var(--card-bg);
             border-top: 1px solid var(--border-color);
@@ -332,14 +329,13 @@
             </div>
         </header>
 
-        <!-- TAB 1: PUBLIC VIEW - DAILY TO-DO & DYNAMIC AD-HOC -->
+        <!-- TAB 1: PUBLIC VIEW -->
         <div id="tab-todo" class="tab-content active">
             <div class="daily-greeting">Hôm nay: <b id="today-str">Thứ Hai, 24/08/2026</b>. Linh hoạt biến chuyển theo mục tiêu!</div>
             
             <div class="card">
                 <h3>Checklist Thực Thi (Dynamic Focus)</h3>
                 <div id="dynamicTodoList">
-                    <!-- Nội dung sẽ tự động render linh hoạt dựa trên trọng tâm mục tiêu hiện tại -->
                     <div class="time-block">
                         <div class="time-block-title">Trọng tâm hiện tại: Tăng tốc BĐS Đà Nẵng (2 tháng chốt deal)</div>
                         <div class="todo-item-row"><input type="checkbox"><div><span>Tập trung 80% thời gian tối cho Salephone & mở rộng data khách hàng</span><span class="todo-purpose">Chiến lược: Tiết chế tạm thời khối lượng ôn thi Thần học</span></div></div>
@@ -361,7 +357,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: PRIVATE MODULE - DYNAMIC STRATEGY & MULTI-LAYER PLANNING -->
+        <!-- TAB 2: PRIVATE MODULE -->
         <div id="tab-strategy" class="tab-content">
             <div class="badge-status">🔒 FMFT Dynamic Private AI Strategy</div>
             
@@ -378,7 +374,7 @@
                 <div class="chat-box">
                     <div class="chat-messages" id="privateChatMessages">
                         <div class="message ai">
-                            Chào Việt! Tôi hoàn toàn đồng ý: Mục tiêu không bao giờ cứng nhắc. Bạn muốn thêm mục tiêu mới, xóa bớt mục tiêu cũ, hay thay đổi trọng tâm chiến lược (ví dụ: tháng này đẩy mạnh BĐS, tháng sau dồn sức cho Thần học), cứ ra lệnh cho tôi. Tôi sẽ tự động cân đối lại chiến lược Quý - Tháng - Tuần và phơi bày kết quả thực thi ra màn hình ngoài!
+                            Chào Việt! Tôi hoàn toàn đồng ý: Mục tiêu không bao giờ cứng nhắc. Bạn muốn thêm mục tiêu mới, xóa bớt mục tiêu cũ, hay thay đổi trọng tâm chiến lược, cứ ra lệnh cho tôi. Tôi sẽ tự động cân đối lại chiến lược và phơi bày kết quả thực thi ra màn hình ngoài!
                         </div>
                     </div>
                     <div class="chat-input-area">
@@ -389,7 +385,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: CÀI ĐẶT & BẢO TOÀN NGỮ CẢNH LOCAL -->
+        <!-- TAB 3: SETTINGS -->
         <div id="tab-settings" class="tab-content">
             <div class="card">
                 <h3>Cấu hình FMFT AI & Local Storage</h3>
@@ -430,7 +426,7 @@
             const chatContainer = document.getElementById('privateChatMessages');
             chatContainer.innerHTML = '';
             state.chatHistory.forEach(msg => {
-                chatContainer.innerHTML += `<div class="message ${msg.role}">${msg.text.replace(/\n/g, '<br>')}</div>`;
+                chatContainer.innerHTML += `<div class="message ${msg.role}">${escapeHtml(msg.text).replace(/\n/g, '<br>')}</div>`;
             });
         }
 
@@ -503,7 +499,7 @@
 
             if (!state.apiKey) {
                 const aiMsg = "Bạn ơi, hãy vào Cài đặt (⚙️) nhập API Key để FMFT AI kích hoạt hệ thống tư vấn chiến lược động nhé!";
-                chatMessages.innerHTML += `<div class="message ai">${aiMsg}</div>`;
+                chatMessages.innerHTML += `<div class="message ai">${escapeHtml(aiMsg)}</div>`;
                 state.chatHistory.push({ role: 'ai', text: aiMsg });
                 saveState();
                 return;
@@ -513,42 +509,48 @@
             chatMessages.innerHTML += `<div class="message ai" id="${loadingId}">FMFT AI đang phân tích lại ngữ cảnh, tái cấu trúc mục tiêu và chiến lược...</div>`;
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            const systemPrompt = `Bạn là FMFT AI Coaching - hệ thống cố vấn chiến lược và đồng hành cá nhân thông minh, tâm lý, sáng tạo, vui tính, nói ngắn gọn súc tích và KHÔNG BAO GIỜ độc tài.
-Người dùng tên Việt. Hệ thống của bạn hoạt động theo tư duy Dynamic Living OS: Mục tiêu hoàn toàn linh hoạt, thay đổi tùy theo ngữ cảnh thời cuộc (VD: muốn dồn 2 tháng cho BĐS thì tiết chế ôn thi Thần học, hoặc thêm/xóa/điều chỉnh trọng số bất cứ lúc nào).
-Nhiệm vụ: Lắng nghe ý kiến thay đổi mục tiêu, phân rã lại chiến lược Quý - Tháng - Tuần, và đưa ra lời khuyên sắc sảo, ngắn gọn.`;
+            const systemInstruction = "Bạn là FMFT AI Coaching - hệ thống cố vấn chiến lược và đồng hành cá nhân thông minh, tâm lý, sáng tạo, vui tính, nói ngắn gọn súc tích và KHÔNG BAO GIỜ độc tài. Người dùng tên Việt. Hệ thống hoạt động theo Dynamic Living OS: Mục tiêu linh hoạt theo thời cuộc.";
 
             try {
+                // Chuẩn hóa gọi đúng model gemini-1.5-flash và truyền system_instruction chuẩn cấu trúc Google API
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        system_instruction: {
+                            parts: [{ text: systemInstruction }]
+                        },
                         contents: [{
-                            parts: [
-                                { text: systemPrompt + "\n\nYêu cầu thay đổi trọng tâm/mục tiêu từ Việt: " + text }
-                            ]
+                            role: "user",
+                            parts: [{ text: text }]
                         }]
                     })
                 });
 
                 const data = await response.json();
-                document.getElementById(loadingId).remove();
+                const loadingElement = document.getElementById(loadingId);
+                if (loadingElement) loadingElement.remove();
 
-                if (data.candidates && data.candidates[0].content) {
+                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
                     let aiReply = data.candidates[0].content.parts[0].text;
                     chatMessages.innerHTML += `<div class="message ai">${escapeHtml(aiReply).replace(/\n/g, '<br>')}</div>`;
                     state.chatHistory.push({ role: 'ai', text: aiReply });
                     saveState();
+                } else if (data.error) {
+                    chatMessages.innerHTML += `<div class="message ai">Lỗi từ Google API: ${escapeHtml(data.error.message || 'Không xác định')}</div>`;
                 } else {
                     chatMessages.innerHTML += `<div class="message ai">Kết nối gián đoạn, kiểm tra lại API Key giúp mình nhé!</div>`;
                 }
             } catch (error) {
-                document.getElementById(loadingId).remove();
-                chatMessages.innerHTML += `<div class="message ai">Lỗi kết nối mạng hoặc API. Thử lại nha Việt!</div>`;
+                const loadingElement = document.getElementById(loadingId);
+                if (loadingElement) loadingElement.remove();
+                chatMessages.innerHTML += `<div class="message ai">Lỗi kết nối mạng hoặc CORS. Thử lại nha Việt!</div>`;
             }
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function escapeHtml(text) {
+            if (!text) return '';
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
     </script>
