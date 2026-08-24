@@ -416,6 +416,18 @@
     </div>
 
     <script>
+        // TỰ ĐỘNG QUÉT VÀ XÓA BỎ MỌI KÝ TỰ TỒN ĐỌNG TRÊN GIAO DIỆN
+        document.addEventListener("DOMContentLoaded", () => {
+            const cleanCitations = (node) => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node.nodeValue = node.nodeValue.replace(/\/g, '');
+                } else {
+                    node.childNodes.forEach(cleanCitations);
+                }
+            };
+            cleanCitations(document.body);
+        });
+
         let state = JSON.parse(localStorage.getItem('fmft_dynamic_state')) || {
             apiKey: '',
             chatHistory: []
