@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FMFT AI Coaching - Dynamic Living OS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FAFAFA;
+            --card-bg: #FFFFFF;
+            --text-main: #1A1A1A;
+            --text-muted: #737373;
+            --border-color: #E5E5E5;
+            --accent-gold: #D4AF37;
+            --accent-dark: #111111;
+            --success-color: #10B981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            width: 100vw;
+            max-width: 414px;
+            height: 100vh;
+            max-height: 896px;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 480px) {
+            .mobile-container {
+                border-radius: 40px;
+                border: 8px solid #222;
+                box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+                height: 844px;
+            }
+        }
+
+        header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--accent-dark);
+        }
+
+        .logo span {
+            color: var(--accent-gold);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 14px;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Public Dynamic Todo List */
+        .daily-greeting {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .time-block {
+            margin-bottom: 10px;
+            border-left: 2px solid var(--accent-gold);
+            padding-left: 8px;
+        }
+
+        .time-block-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .todo-item-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 5px;
+            font-size: 11px;
+            color: var(--text-main);
+        }
+
+        .todo-item-row input[type="checkbox"] {
+            accent-color: var(--accent-dark);
+            margin-top: 2px;
+        }
+
+        .todo-purpose {
+            display: block;
+            font-size: 9px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .adhoc-box {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .adhoc-box input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 11px;
+            outline: none;
+        }
+
+        .adhoc-box button {
+            background: var(--accent-dark);
+            color: #fff;
+            border: none;
+            padding: 0 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Private Dynamic Strategy & Multi-layer Planning */
+        .hierarchy-box {
+            background: #F9F9F9;
+            border: 1px dashed var(--accent-gold);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .hierarchy-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 4px;
+        }
+
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            height: 260px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+            margin-top: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-bottom: 6px;
+        }
+
+        .message {
+            max-width: 90%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .message.ai {
+            background: #F4F4F4;
+            color: var(--text-main);
+            align-self: flex-start;
+        }
+
+        .message.user {
+            background: var(--accent-dark);
+            color: #fff;
+            align-self: flex-end;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 6px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            font-size: 11px;
+        }
+
+        .chat-input-area button {
+            background: var(--accent-gold);
+            color: #111;
+            border: none;
+            padding: 0 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        /* Bottom Nav */
+        nav.bottom-nav {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 9px;
+            font-weight: 500;
+            background: none;
+            border: none;
+        }
+
+        .nav-item.active {
+            color: var(--accent-gold);
+        }
+
+        .nav-item svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .badge-status {
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--accent-gold);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <!-- Header -->
+        <header>
+            <div class="logo">FMFT AI <span>OS</span></div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="switchTab('settings')">⚙️</button>
+            </div>
+        </header>
+
+        <!-- TAB 1: PUBLIC VIEW - DAILY TO-DO & DYNAMIC AD-HOC -->
+        <div id="tab-todo" class="tab-content active">
+            <div class="daily-greeting">Hôm nay: <b id="today-str">Thứ Hai, 24/08/2026</b>. Linh hoạt biến chuyển theo mục tiêu!</div>
+            
+            <div class="card">
+                <h3>Checklist Thực Thi (Dynamic Focus)</h3>
+                <div id="dynamicTodoList">
+                    <!-- Nội dung sẽ tự động render linh hoạt dựa trên trọng tâm mục tiêu hiện tại -->
+                    <div class="time-block">
+                        <div class="time-block-title">Trọng tâm hiện tại: Tăng tốc BĐS Đà Nẵng (2 tháng chốt deal)</div>
+                        <div class="todo-item-row"><input type="checkbox"><div><span>Tập trung 80% thời gian tối cho Salephone & mở rộng data khách hàng</span><span class="todo-purpose">Chiến lược: Tiết chế tạm thời khối lượng ôn thi Thần học</span></div></div>
+                        <div class="todo-item-row"><input type="checkbox"><div><span>Cập nhật giỏ hàng & quản lý file CRM BĐS hằng ngày</span><span class="todo-purpose">Mục tiêu: Sẵn sàng nguồn hàng chốt deal</span></div></div>
+                    </div>
+
+                    <div class="time-block">
+                        <div class="time-block-title">Kỷ luật bản thân & Sức khỏe cốt lõi</div>
+                        <div class="todo-item-row"><input type="checkbox"><div><span>Dậy sớm, thể dục nhẹ nhàng (06:00)</span><span class="todo-purpose">Năng lượng đỉnh cao</span></div></div>
+                        <div class="todo-item-row"><input type="checkbox"><div><span>Đọc lướt nhanh 1 chương Kinh Thánh ngắn gọn trước khi ngủ</span><span class="todo-purpose">Duy trì mạch ôn thi dài hạn</span></div></div>
+                        <div class="todo-item-row"><input type="checkbox"><div><span>Đi ngủ đúng giờ trước 23:00</span><span class="todo-purpose">Bảo vệ sức khỏe sinh học</span></div></div>
+                    </div>
+                </div>
+
+                <div class="adhoc-box">
+                    <input type="text" id="adhocInput" placeholder="Thêm việc phát sinh (VD: Sếp gọi họp gấp...)">
+                    <button onclick="addAdhocTask()">Cập nhật AI</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: PRIVATE MODULE - DYNAMIC STRATEGY & MULTI-LAYER PLANNING -->
+        <div id="tab-strategy" class="tab-content">
+            <div class="badge-status">🔒 FMFT Dynamic Private AI Strategy</div>
+            
+            <div class="hierarchy-box">
+                <div class="hierarchy-title">Trạng Thái Mục Tiêu & Trọng Số Hiện Tại</div>
+                <p id="currentFocusDesc" style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                    • <b>Mục tiêu chủ đạo giai đoạn này:</b> Dồn lực 2 tháng chốt deal BĐS Đà Nẵng.<br>
+                    • <b>Điều chỉnh linh hoạt:</b> Tạm lùi lịch ôn thi Thần học chuyên sâu (chỉ duy trì đọc lướt giữ nhịp), tập trung 100% thời gian tối cho marketing & salephone.
+                </p>
+            </div>
+
+            <div class="card" style="margin-bottom: 0;">
+                <h3>Trao Đổi, Thay Đổi & Tái Cấu Trúc Plan</h3>
+                <div class="chat-box">
+                    <div class="chat-messages" id="privateChatMessages">
+                        <div class="message ai">
+                            Chào Việt! Tôi hoàn toàn đồng ý: Mục tiêu không bao giờ cứng nhắc. Bạn muốn thêm mục tiêu mới, xóa bớt mục tiêu cũ, hay thay đổi trọng tâm chiến lược (ví dụ: tháng này đẩy mạnh BĐS, tháng sau dồn sức cho Thần học), cứ ra lệnh cho tôi. Tôi sẽ tự động cân đối lại chiến lược Quý - Tháng - Tuần và phơi bày kết quả thực thi ra màn hình ngoài!
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="privateUserInput" placeholder="VD: Thay đổi mục tiêu, dồn lực bán hàng BDS..." onkeypress="handlePrivateKeyPress(event)">
+                        <button onclick="sendPrivateMessage()">Trao đổi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CÀI ĐẶT & BẢO TOÀN NGỮ CẢNH LOCAL -->
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <h3>Cấu hình FMFT AI & Local Storage</h3>
+                <p style="margin-bottom:10px; font-size:11px; color:var(--text-muted);">Ngữ cảnh, lịch sử chiến lược và trạng thái biến chuyển mục tiêu được bảo toàn tuyệt đối trên thiết bị.</p>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <input type="password" id="apiKeyInput" placeholder="Nhập Gemini API Key mới..." style="padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
+                    <button onclick="saveApiKey()" style="background:var(--accent-dark); color:#fff; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Lưu API Key & Giữ Nguyên Ngữ Cảnh</button>
+                    <button onclick="exportData()" style="background:none; border:1px solid var(--border-color); padding:6px; border-radius:8px; font-size:11px; cursor:pointer;">Export Backup Dữ Liệu</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchTab('todo')" id="nav-todo">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                List-to-do (Public)
+            </button>
+            <button class="nav-item" onclick="switchTab('strategy')" id="nav-strategy">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                FMFT Private AI
+            </button>
+            <button class="nav-item" onclick="switchTab('settings')" id="nav-settings">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                Cài đặt
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state')) || {
+            apiKey: '',
+            chatHistory: []
+        };
+
+        if (state.apiKey) document.getElementById('apiKeyInput').value = state.apiKey;
+        if (state.chatHistory && state.chatHistory.length > 0) {
+            const chatContainer = document.getElementById('privateChatMessages');
+            chatContainer.innerHTML = '';
+            state.chatHistory.forEach(msg => {
+                chatContainer.innerHTML += `<div class="message ${msg.role}">${msg.text.replace(/\n/g, '<br>')}</div>`;
+            });
+        }
+
+        function saveState() {
+            localStorage.setItem('fmft_dynamic_state', JSON.stringify(state));
+        }
+
+        function saveApiKey() {
+            const val = document.getElementById('apiKeyInput').value.trim();
+            if (val) {
+                state.apiKey = val;
+                saveState();
+                alert('Đã lưu API Key thành công! Ngữ cảnh động được bảo toàn.');
+                switchTab('strategy');
+            } else {
+                alert('Vui lòng nhập API Key hợp lệ.');
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "fmft_dynamic_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            if(document.getElementById('nav-' + tabId)) {
+                document.getElementById('nav-' + tabId).classList.add('active');
+            }
+        }
+
+        function addAdhocTask() {
+            const input = document.getElementById('adhocInput');
+            const taskText = input.value.trim();
+            if (!taskText) return;
+
+            const container = document.getElementById('dynamicTodoList');
+            const newBlock = document.createElement('div');
+            newBlock.className = 'time-block';
+            newBlock.innerHTML = `
+                <div class="time-block-title" style="color: #E63946;">Việc phát sinh đột xuất</div>
+                <div class="todo-item-row"><input type="checkbox" checked><div><span>${escapeHtml(taskText)}</span><span class="todo-purpose">Đã được FMFT AI tái cấu trúc vào thời gian biểu</span></div></div>
+            `;
+            container.insertBefore(newBlock, container.firstChild);
+            input.value = '';
+            alert('Đã cập nhật việc phát sinh! AI đã tự động co giãn lịch trình ngày.');
+        }
+
+        function handlePrivateKeyPress(e) {
+            if (e.key === 'Enter') sendPrivateMessage();
+        }
+
+        async function sendPrivateMessage() {
+            const input = document.getElementById('privateUserInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatMessages = document.getElementById('privateChatMessages');
+            chatMessages.innerHTML += `<div class="message user">${escapeHtml(text)}</div>`;
+            state.chatHistory.push({ role: 'user', text: text });
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            if (!state.apiKey) {
+                const aiMsg = "Bạn ơi, hãy vào Cài đặt (⚙️) nhập API Key để FMFT AI kích hoạt hệ thống tư vấn chiến lược động nhé!";
+                chatMessages.innerHTML += `<div class="message ai">${aiMsg}</div>`;
+                state.chatHistory.push({ role: 'ai', text: aiMsg });
+                saveState();
+                return;
+            }
+
+            const loadingId = 'loading-' + Date.now();
+            chatMessages.innerHTML += `<div class="message ai" id="${loadingId}">FMFT AI đang phân tích lại ngữ cảnh, tái cấu trúc mục tiêu và chiến lược...</div>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const systemPrompt = `Bạn là FMFT AI Coaching - hệ thống cố vấn chiến lược và đồng hành cá nhân thông minh, tâm lý, sáng tạo, vui tính, nói ngắn gọn súc tích và KHÔNG BAO GIỜ độc tài.
+Người dùng tên Việt. Hệ thống của bạn hoạt động theo tư duy Dynamic Living OS: Mục tiêu hoàn toàn linh hoạt, thay đổi tùy theo ngữ cảnh thời cuộc (VD: muốn dồn 2 tháng cho BĐS thì tiết chế ôn thi Thần học, hoặc thêm/xóa/điều chỉnh trọng số bất cứ lúc nào).
+Nhiệm vụ: Lắng nghe ý kiến thay đổi mục tiêu, phân rã lại chiến lược Quý - Tháng - Tuần, và đưa ra lời khuyên sắc sảo, ngắn gọn.`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: systemPrompt + "\n\nYêu cầu thay đổi trọng tâm/mục tiêu từ Việt: " + text }
+                            ]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                if (data.candidates && data.candidates[0].content) {
+                    let aiReply = data.candidates[0].content.parts[0].text;
+                    chatMessages.innerHTML += `<div class="message ai">${escapeHtml(aiReply).replace(/\n/g, '<br>')}</div>`;
+                    state.chatHistory.push({ role: 'ai', text: aiReply });
+                    saveState();
+                } else {
+                    chatMessages.innerHTML += `<div class="message ai">Kết nối gián đoạn, kiểm tra lại API Key giúp mình nhé!</div>`;
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                chatMessages.innerHTML += `<div class="message ai">Lỗi kết nối mạng hoặc API. Thử lại nha Việt!</div>`;
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+</body>
+</html>
