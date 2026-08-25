@@ -411,7 +411,7 @@
         const todayObj = new Date();
         document.getElementById('dateStringDisplay').innerText = `Hôm nay: ${daysOfWeek[todayObj.getDay()]} (${todayObj.toLocaleDateString('vi-VN')}). Hệ thống tự động cuốn chiếu lộ trình!`;
 
-        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v4')) || {
+        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v5')) || {
             apiKey: '',
             chatHistory: [],
             todoList: [
@@ -437,7 +437,7 @@
         renderChatHistory();
 
         function saveState() {
-            localStorage.setItem('fmft_dynamic_state_v4', JSON.stringify(state));
+            localStorage.setItem('fmft_dynamic_state_v5', JSON.stringify(state));
         }
 
         function switchTab(tabId) {
@@ -473,7 +473,7 @@
                     document.getElementById('resetProgress').innerText = `Đang giữ... còn ${countdown} giây`;
                 } else {
                     clearInterval(resetTimer);
-                    localStorage.removeItem('fmft_dynamic_state_v4');
+                    localStorage.removeItem('fmft_dynamic_state_v5');
                     alert('Đã reset toàn bộ hệ thống!');
                     location.reload();
                 }
@@ -558,8 +558,8 @@
 
             const systemInstruction = "Bạn là FMFT AI Coaching - hệ thống cố vấn chiến lược và đồng hành cá nhân thông minh, tâm lý, sáng tạo, vui tính. Người dùng tên Việt. Khi người dùng trình bày mục tiêu, hãy phân tích và đưa ra đề xuất chiến lược ngắn gọn, rõ ràng kèm theo các hành động cụ thể để người dùng kiểm duyệt.";
 
-            // Sử dụng chuẩn model gemini-2.5-flash chính thức
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`;
+            // Cập nhật model chuẩn theo yêu cầu mới nhất: gemini-3.6-flash
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${state.apiKey}`;
 
             let aiReply = null;
             let lastErrorMsg = '';
