@@ -338,15 +338,13 @@
             </div>
         </header>
 
-        <!-- TAB 1: PUBLIC TO-DO LIST (Theo ngày thực + Cuốn chiếu) -->
+        <!-- TAB 1: PUBLIC TO-DO LIST -->
         <div id="tab-todo" class="tab-content active">
             <div class="daily-greeting" id="dateStringDisplay">Hôm nay: Thứ Ba, 25/08/2026</div>
             
             <div class="card">
                 <h3>Checklist Thực Thi (Dynamic Focus)</h3>
-                <div id="dynamicTodoList">
-                    <!-- Dynamic injected by state -->
-                </div>
+                <div id="dynamicTodoList"></div>
 
                 <div class="adhoc-box">
                     <input type="text" id="adhocInput" placeholder="Thêm việc phát sinh nhanh...">
@@ -355,7 +353,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: FMFT PRIVATE AI (Chat, Đề xuất & Duyệt chiến lược) -->
+        <!-- TAB 2: FMFT PRIVATE AI -->
         <div id="tab-strategy" class="tab-content">
             <div class="badge-status">🔒 FMFT Private AI Strategy & Coaching</div>
             
@@ -380,9 +378,9 @@
             <div class="modal-content">
                 <h3 style="margin-bottom: 12px;">Cài đặt hệ thống</h3>
                 <div style="display:flex; flex-direction:column; gap:10px;">
-                    <label style="font-size:11px; color:var(--text-muted);">Gemini API Key:</label>
+                    <label style="font-size:11px; color:var(--text-muted);">Gemini API Key (Hỗ trợ bắt đầu bằng QA...):</label>
                     <input type="password" id="apiKeyInput" placeholder="Dán API Key vào đây..." style="padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
-                    <button onclick="saveApiKey()" style="background:var(--accent-dark); color:#fff; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Lưu API Key</button>
+                    <button onclick="saveApiKey()" style="background:var(--accent-dark); color:#fff; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Lưu API Key & Giữ Bối Cảnh</button>
                     
                     <hr style="border:0; border-top:1px solid var(--border-color); margin: 6px 0;">
                     
@@ -409,14 +407,11 @@
     </div>
 
     <script>
-        // Khởi tạo ngày thực tế
         const daysOfWeek = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
         const todayObj = new Date();
-        const dateStrFormatted = `${daysOfWeek[todayObj.getDay()], todayObj.toLocaleDateString('vi-VN')}`;
-        document.getElementById('dateStringDisplay').innerText = `Hôm nay: ${daysOfWeek[todayObj.getDay()]} (${todayObj.toLocaleDateString('vi-VN')}). Hệ thống tự động cuốn chiếu lộ trình!`;
+        document.getElementById('dateStringDisplay').innerText = `Hôm nay: ${daysOfWeek[todayObj.getDay()]} (${todayObj.toLocaleDateString('vi-VN')}). Lộ trình tự động cuốn chiếu!`;
 
-        // State quản lý dữ liệu toàn cục
-        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v2')) || {
+        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v3')) || {
             apiKey: '',
             chatHistory: [],
             todoList: [
@@ -442,10 +437,9 @@
         renderChatHistory();
 
         function saveState() {
-            localStorage.setItem('fmft_dynamic_state_v2', JSON.stringify(state));
+            localStorage.setItem('fmft_dynamic_state_v3', JSON.stringify(state));
         }
 
-        // Chuyển Tab mượt mà không lỗi
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
@@ -461,14 +455,13 @@
             if (val) {
                 state.apiKey = val;
                 saveState();
-                alert('Đã lưu API Key thành công!');
+                alert('Đã lưu API Key thành công! Bối cảnh và lịch sử cũ được giữ nguyên.');
                 closeSettingsModal();
             } else {
                 alert('Vui lòng nhập API Key hợp lệ.');
             }
         }
 
-        // Nút Reset nhấn giữ 10 giây
         let resetTimer = null;
         let countdown = 10;
         function startResetTimer() {
@@ -480,7 +473,7 @@
                     document.getElementById('resetProgress').innerText = `Đang giữ... còn ${countdown} giây`;
                 } else {
                     clearInterval(resetTimer);
-                    localStorage.removeItem('fmft_dynamic_state_v2');
+                    localStorage.removeItem('fmft_dynamic_state_v3');
                     alert('Đã reset toàn bộ hệ thống!');
                     location.reload();
                 }
@@ -493,7 +486,6 @@
             }
         }
 
-        // Render To-do List theo ngày thực & cuốn chiếu
         function renderTodoList() {
             const container = document.getElementById('dynamicTodoList');
             container.innerHTML = '';
@@ -526,7 +518,6 @@
             input.value = '';
         }
 
-        // Chat & Duyệt chiến lược
         function renderChatHistory() {
             const chatMessages = document.getElementById('privateChatMessages');
             chatMessages.innerHTML = '';
@@ -567,13 +558,21 @@
 
             const systemInstruction = "Bạn là FMFT AI Coaching - hệ thống cố vấn chiến lược và đồng hành cá nhân thông minh, tâm lý, sáng tạo, vui tính. Người dùng tên Việt. Khi người dùng trình bày mục tiêu, hãy phân tích và đưa ra đề xuất chiến lược ngắn gọn, rõ ràng kèm theo các hành động cụ thể để người dùng kiểm duyệt.";
 
+            // Tổng hợp lại ngữ cảnh lịch sử trước đó để duy trì bối cảnh xuyên suốt
+            const contents = state.chatHistory
+                .filter(m => m.id !== loadingId)
+                .map(m => ({
+                    role: m.role === 'ai' ? 'model' : 'user',
+                    parts: [{ text: m.text }]
+                }));
+
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         system_instruction: { parts: [{ text: systemInstruction }] },
-                        contents: [{ role: "user", parts: [{ text: text }] }]
+                        contents: contents
                     })
                 });
 
@@ -583,7 +582,7 @@
                 if (data.candidates && data.candidates[0].content) {
                     const aiReply = data.candidates[0].content.parts[0].text;
                     state.chatHistory.push({ 
-                        role: 'ai', 
+                        role: 'model', 
                         text: aiReply, 
                         id: Date.now(), 
                         hasApproveBtn: true, 
@@ -592,14 +591,16 @@
                             { category: "Chiến lược mới từ Private AI", items: [{ text: "Triển khai nội dung vừa thảo luận với AI", purpose: "Theo yêu cầu mới của Việt", checked: false }] }
                         ]
                     });
+                } else if (data.error) {
+                    state.chatHistory.push({ role: 'ai', text: `Lỗi từ Google API: ${data.error.message}`, id: Date.now() });
                 } else {
-                    state.chatHistory.push({ role: 'ai', text: "Lỗi kết nối AI, cậu kiểm tra lại API Key nhé!", id: Date.now() });
+                    state.chatHistory.push({ role: 'ai', text: "Phản hồi từ AI không hợp lệ, kiểm tra lại API Key nhé!", id: Date.now() });
                 }
                 saveState();
                 renderChatHistory();
             } catch (err) {
                 state.chatHistory = state.chatHistory.filter(m => m.id !== loadingId);
-                state.chatHistory.push({ role: 'ai', text: "Lỗi mạng hoặc API không phản hồi.", id: Date.now() });
+                state.chatHistory.push({ role: 'ai', text: `Lỗi kết nối mạng: ${err.message}`, id: Date.now() });
                 renderChatHistory();
             }
         }
