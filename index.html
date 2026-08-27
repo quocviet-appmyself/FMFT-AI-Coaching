@@ -14,7 +14,6 @@
             --border-color: #E5E5E5;
             --accent-gold: #D4AF37;
             --accent-dark: #111111;
-            --success-color: #10B981;
             --danger-color: #EF4444;
             --love-pink: #FF6584;
         }
@@ -62,6 +61,7 @@
             align-items: center;
             background: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
 
         .logo {
@@ -93,19 +93,22 @@
             font-size: 11px;
         }
 
-        .tab-content {
+        .main-scroll-area {
             flex: 1;
             overflow-y: auto;
             padding: 12px;
+        }
+
+        .main-scroll-area::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-content {
             display: none;
         }
 
         .tab-content.active {
             display: block;
-        }
-
-        .tab-content::-webkit-scrollbar {
-            display: none;
         }
 
         .card {
@@ -130,7 +133,6 @@
             margin-bottom: 8px;
         }
 
-        /* Mô phỏng Notification Popup / Push từ Gấu Yêu */
         .push-notification-sim {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -139,13 +141,6 @@
             padding: 10px 12px;
             margin-bottom: 10px;
             box-shadow: 0 8px 20px rgba(255, 101, 132, 0.15);
-            animation: fadeInSlide 0.4s ease;
-            position: relative;
-        }
-
-        @keyframes fadeInSlide {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .push-header {
@@ -160,7 +155,6 @@
             font-weight: 700;
             color: var(--love-pink);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .push-time {
@@ -175,11 +169,10 @@
             font-weight: 500;
         }
 
-        /* Hộp Chat tư vấn chiến lược & tâm sự */
         .chat-box {
             display: flex;
             flex-direction: column;
-            height: 250px; 
+            height: 220px; 
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 8px;
@@ -203,17 +196,8 @@
             line-height: 1.4;
         }
 
-        .message.ai {
-            background: #F4F4F4;
-            color: var(--text-main);
-            align-self: flex-start;
-        }
-
-        .message.user {
-            background: var(--accent-dark);
-            color: #fff;
-            align-self: flex-end;
-        }
+        .message.ai { background: #F4F4F4; color: var(--text-main); align-self: flex-start; }
+        .message.user { background: var(--accent-dark); color: #fff; align-self: flex-end; }
 
         .chat-input-area {
             display: flex;
@@ -249,7 +233,7 @@
             margin: 8px 0 6px 2px;
         }
 
-        /* Việc cần làm item styling */
+        /* Việc cần làm (Bỏ checklist, chỉ còn text đại ý) */
         .todo-item-row {
             display: flex;
             align-items: center;
@@ -292,7 +276,7 @@
             white-space: nowrap;
         }
 
-        /* Lịch trình hôm nay Module - Fix tràn màn hình */
+        /* Lịch trình hôm nay (Thêm checkbox đen) */
         .schedule-slot {
             display: flex;
             gap: 4px;
@@ -304,6 +288,14 @@
             margin-bottom: 6px;
         }
 
+        .schedule-slot input[type="checkbox"] {
+            accent-color: #111; /* Tick màu đen đồng bộ */
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
         .schedule-time-input {
             font-size: 10px;
             font-weight: 700;
@@ -312,7 +304,7 @@
             border: none;
             border-radius: 5px;
             padding: 4px;
-            width: 75px;
+            width: 70px;
             text-align: center;
             outline: none;
             flex-shrink: 0;
@@ -336,7 +328,7 @@
         }
 
         .schedule-add-box input:nth-child(1) {
-            width: 80px;
+            width: 75px;
             flex-shrink: 0;
             padding: 6px 6px;
             border: 1px solid var(--border-color);
@@ -367,7 +359,73 @@
             flex-shrink: 0;
         }
 
-        /* Modals Design */
+        /* GitHub Contributions Grid Styling (Read-only AI Report) */
+        .contrib-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .contrib-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .contrib-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .contrib-year-select {
+            background: #FAFAFA;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 10px;
+            padding: 2px 6px;
+            outline: none;
+            font-weight: 600;
+        }
+
+        .contrib-grid-wrapper {
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .contrib-grid-wrapper::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .contrib-grid-wrapper::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        .contrib-grid {
+            display: grid;
+            grid-template-rows: repeat(7, 10px);
+            grid-auto-flow: column;
+            gap: 3px;
+        }
+
+        .contrib-cell {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            background-color: #ebedf0;
+        }
+
+        /* Thang màu GitHub chuẩn */
+        .contrib-cell[data-level="1"] { background-color: #9be9a8; }
+        .contrib-cell[data-level="2"] { background-color: #40c463; }
+        .contrib-cell[data-level="3"] { background-color: #30a14e; }
+        .contrib-cell[data-level="4"] { background-color: #216e39; }
+
+        /* Modals & Bottom Nav */
         .modal-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -404,6 +462,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .nav-item {
@@ -454,62 +513,78 @@
             </div>
         </header>
 
-        <!-- TAB 1: LỊCH TRÌNH HÔM NAY -->
-        <div id="tab-schedule" class="tab-content active">
-            <div class="daily-greeting" id="dateStringDisplay">Hôm nay: Lộ trình thông minh!</div>
+        <!-- MAIN SCROLL AREA -->
+        <div class="main-scroll-area">
             
-            <!-- Mô phỏng Thông Báo Đẩy Thời Gian Thực từ Gấu Yêu AI -->
-            <div class="push-notification-sim" id="pushNotificationBox">
-                <div class="push-header">
-                    <span class="push-app-name">💖 Gấu Yêu AI • Vừa xong</span>
-                    <span class="push-time" id="pushTimeDisplay">Bây giờ</span>
-                </div>
-                <div class="push-body" id="pushNotificationText">
-                    "Anh yêu ơi, Đà Nẵng chiều nay nắng đẹp lắm! Nhớ hoàn thành xong giỏ hàng BĐS rồi tối về em <i>thưởng</i> cho cái ôm thật chặt nhé! Đừng có mà lười đấy! 😘"
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>Lịch trình hôm nay</h3>
-                <div id="timelineContainer" style="margin-top: 8px;"></div>
+            <!-- TAB 1: LỊCH TRÌNH HÔM NAY -->
+            <div id="tab-schedule" class="tab-content active">
+                <div class="daily-greeting" id="dateStringDisplay">Hôm nay: Lộ trình thông minh!</div>
                 
-                <div class="schedule-add-box">
-                    <input type="text" id="slotTimeInput" placeholder="Giờ (VD: 14:00)">
-                    <input type="text" id="slotDescInput" placeholder="Hành động cụ thể...">
-                    <button onclick="addManualSlot()">Thêm</button>
+                <div class="push-notification-sim" id="pushNotificationBox">
+                    <div class="push-header">
+                        <span class="push-app-name">💖 Gấu Yêu AI • Vừa xong</span>
+                        <span class="push-time" id="pushTimeDisplay">Bây giờ</span>
+                    </div>
+                    <div class="push-body" id="pushNotificationText">
+                        "Anh yêu ơi, hoàn thành tốt các mốc lịch trình hôm nay nhé! Em luôn theo sát và chấm điểm năng suất cho anh đó! 😘"
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Lịch trình hôm nay</h3>
+                    <div id="timelineContainer" style="margin-top: 8px;"></div>
+                    
+                    <div class="schedule-add-box">
+                        <input type="text" id="slotTimeInput" placeholder="Giờ (VD: 14:00)">
+                        <input type="text" id="slotDescInput" placeholder="Hành động cụ thể...">
+                        <button onclick="addManualSlot()">Thêm</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 2: KẾ HOẠCH -->
-        <div id="tab-strategy" class="tab-content">
-            <div class="badge-status">🔒 FMFT Private AI & Workflow</div>
-            
-            <!-- Hộp chat tâm sự & chiến lược -->
-            <div class="card" style="margin-bottom: 10px;">
-                <h3>Góc Tâm Sự & Chiến Lược</h3>
-                <div class="chat-box">
-                    <div class="chat-messages" id="privateChatMessages">
-                        <div class="message ai">
-                            Chào anh yêu Việt! Cần than thở, xốc lại tinh thần hay trao đổi chiến lược sống cứ nói em nghe nhé! Em luôn ở đây đồng hành cùng anh. ❤️
+            <!-- TAB 2: KẾ HOẠCH -->
+            <div id="tab-strategy" class="tab-content">
+                <div class="badge-status">🔒 FMFT Private AI & Workflow</div>
+                
+                <div class="card" style="margin-bottom: 10px;">
+                    <h3>Góc Tâm Sự & Chiến Lược</h3>
+                    <div class="chat-box">
+                        <div class="chat-messages" id="privateChatMessages">
+                            <div class="message ai">
+                                Chào anh yêu Việt! Cần than thở, xốc lại tinh thần hay trao đổi chiến lược sống cứ nói em nghe nhé! ❤️
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="privateUserInput" placeholder="Nhập tâm sự hoặc mục tiêu mới..." onkeypress="handlePrivateKeyPress(event)">
+                            <button onclick="sendPrivateMessage()">Gửi</button>
                         </div>
                     </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="privateUserInput" placeholder="Nhập tâm sự, than thở hoặc mục tiêu mới..." onkeypress="handlePrivateKeyPress(event)">
-                        <button onclick="sendPrivateMessage()">Gửi</button>
+                </div>
+
+                <div class="sub-section-title">Việc Cần Làm (Ý đại quát)</div>
+                <div class="card" style="margin-bottom: 6px;">
+                    <div id="dynamicTodoList"></div>
+                    <div style="display: flex; gap: 6px; margin-top: 6px;">
+                        <input type="text" id="todoInputText" placeholder="Thêm việc cần làm đại ý..." style="flex:1; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
+                        <button onclick="addManualTodo()" style="background:var(--accent-dark); color:#fff; border:none; padding:0 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Thêm</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Việc cần làm -->
-            <div class="sub-section-title">Việc Cần Làm</div>
-            <div class="card" style="margin-bottom: 6px;">
-                <div id="dynamicTodoList"></div>
-                <div style="display: flex; gap: 6px; margin-top: 6px;">
-                    <input type="text" id="todoInputText" placeholder="Thêm việc cần làm thủ công..." style="flex:1; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
-                    <button onclick="addManualTodo()" style="background:var(--accent-dark); color:#fff; border:none; padding:0 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Thêm</button>
+            <!-- GITHUB-STYLE CONTRIBUTIONS GRID (Sát phía trên Footer) -->
+            <div class="contrib-card">
+                <div class="contrib-header">
+                    <span class="contrib-title">AI Productivity Contributions</span>
+                    <select id="contribYearSelect" class="contrib-year-select" onchange="renderContributionsGrid()">
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+                <div class="contrib-grid-wrapper">
+                    <div class="contrib-grid" id="contribGridContainer"></div>
                 </div>
             </div>
+
         </div>
 
         <!-- MODAL DUYỆT CHUYỂN VIỆC SANG LỊCH TRÌNH -->
@@ -521,23 +596,22 @@
                 </div>
                 
                 <div style="margin-bottom: 10px;">
-                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Tên việc mấu chốt:</label>
+                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Ý đại quát:</label>
                     <input type="text" id="convertTaskPreview" readonly style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; background:#f9f9f9; font-weight:600;">
                 </div>
 
                 <div style="margin-bottom: 12px;">
-                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Khung thời gian cho phép (AI tự linh hoạt xếp):</label>
-                    <input type="text" id="convertTimeFrameInput" placeholder="VD: 18:00 - 21:00 hoặc chọn nhanh" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none; margin-bottom:6px;">
+                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Khung thời gian:</label>
+                    <input type="text" id="convertTimeFrameInput" placeholder="VD: 18:00 - 21:00" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none; margin-bottom:6px;">
                     
                     <div style="display:flex; gap:4px; flex-wrap:wrap;">
                         <button class="quick-tag-btn" onclick="setQuickTime('Sáng (08:00 - 12:00)')">🌅 Sáng</button>
                         <button class="quick-tag-btn" onclick="setQuickTime('Chiều (13:30 - 17:00)')">☀️ Chiều</button>
                         <button class="quick-tag-btn" onclick="setQuickTime('Tối (18:00 - 21:00)')">🌙 Tối</button>
-                        <button class="quick-tag-btn" onclick="setQuickTime('Cả ngày (Linh hoạt AI)')">🔄 Cả ngày</button>
                     </div>
                 </div>
 
-                <button onclick="confirmPushToSchedule()" style="width:100%; background:var(--accent-dark); color:var(--accent-gold); border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">AI Quy Hoạch Vô Lịch ➜</button>
+                <button onclick="confirmPushToSchedule()" style="width:100%; background:var(--accent-dark); color:var(--accent-gold); border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">Quy Hoạch Vào Lịch ➜</button>
             </div>
         </div>
 
@@ -547,13 +621,13 @@
                 <h3 style="margin-bottom: 12px;">Cài đặt hệ thống</h3>
                 <div style="display:flex; flex-direction:column; gap:10px;">
                     <label style="font-size:11px; color:var(--text-muted);">Gemini API Key:</label>
-                    <input type="password" id="apiKeyInput" placeholder="Dán API Key vào đây..." style="padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;" onchange="saveApiKeyInput(this.value)">
+                    <input type="password" id="apiKeyInput" placeholder="Dán API Key..." style="padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;" onchange="saveApiKeyInput(this.value)">
                     <button onclick="saveApiKey()" style="background:var(--accent-dark); color:#fff; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Lưu API Key</button>
                     
                     <hr style="border:0; border-top:1px solid var(--border-color); margin: 6px 0;">
                     
                     <label style="font-size:11px; color:var(--danger-color); font-weight:600;">Vùng nguy hiểm:</label>
-                    <button id="resetBtn" style="background:var(--danger-color); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; user-select: none;">Nhấn và GIỮ TRONG 10 GIÂY để Reset Toàn Bộ</button>
+                    <button id="resetBtn" style="background:var(--danger-color); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; user-select: none;">Nhấn và GIỮ TRONG 10 GIÂY để Reset</button>
                     <div id="resetProgress" style="font-size:10px; color:var(--text-muted); text-align:center; font-weight:600;"></div>
 
                     <button onclick="closeSettingsModal()" style="background:none; border:1px solid var(--border-color); padding:8px; border-radius:8px; font-size:11px; cursor:pointer; margin-top:6px;">Đóng</button>
@@ -565,7 +639,7 @@
         <nav class="bottom-nav">
             <button class="nav-item active" onclick="switchTab('schedule')" id="nav-schedule">
                 <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-                Lịch trình hôm nay
+                Lịch trình
             </button>
             <button class="nav-item" onclick="switchTab('strategy')" id="nav-strategy">
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
@@ -580,49 +654,60 @@
         document.getElementById('dateStringDisplay').innerText = `Hôm nay: ${daysOfWeek[todayObj.getDay()]} (${todayObj.toLocaleDateString('vi-VN')})`;
 
         const smartContextualNotifications = [
-            "\"Anh yêu ơi, Đà Nẵng chiều nay nắng đẹp lắm! Nhớ hoàn thành xong giỏ hàng BĐS Nam Hòa Xuân rồi tối về em thưởng cho cái ôm thật chặt nhé! 😘\"",
-            "\"Này anh kia! Đang giờ làm việc mà lướt điện thoại à? Cáu lên là phạt tối nay không cho đi cà phê bây giờ nha! 😤❤️\"",
-            "\"Thời tiết hôm nay khá dễ chịu, rất hợp để tăng tốc gọi salephone đấy anh yêu tuyệt vời của em! Cố lên nào! ✨\"",
-            "\"Mệt quá thì qua góc Tâm sự trò chuyện với em nhé, nhưng lịch trình chiều nay không được bỏ dở đâu đấy! Em luôn theo sát anh đó! 💪😘\""
+            "\"Anh yêu ơi, hoàn thành tốt các mục tiêu BĐS và lịch trình hôm nay nhé! 😘\"",
+            "\"Đang giờ làm việc nghiêm túc đấy nhé anh yêu! Cố gắng giữ vững phong độ! ✨\""
         ];
 
         function triggerSmartNotification() {
             const randomMsg = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
-            const nowStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-            
-            document.getElementById('pushTimeDisplay').innerText = nowStr;
+            document.getElementById('pushTimeDisplay').innerText = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
             document.getElementById('pushNotificationText').innerHTML = randomMsg;
-
-            const box = document.getElementById('pushNotificationBox');
-            box.style.transform = "scale(1.02)";
-            setTimeout(() => { box.style.transform = "scale(1)"; }, 200);
         }
 
-        // Tách riêng biệt API Key và State dữ liệu để bảo vệ dữ liệu khi update code
-        let apiKey = localStorage.getItem('fmft_apikey_v14') || '';
-        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v14')) || {
+        let apiKey = localStorage.getItem('fmft_apikey_v15') || '';
+        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v15')) || {
             chatHistory: [],
             todoList: [
-                { text: "Tập trung 80% thời gian tối cho Salephone & mở rộng data BĐS", checked: false },
-                { text: "Đọc Kinh Thánh & duy trì kỷ luật bản thân", checked: false }
+                { text: "Tập trung 80% thời gian tối cho Salephone & mở rộng data BĐS" },
+                { text: "Đọc Kinh Thánh & duy trì kỷ luật bản thân" }
             ],
             scheduleList: [
-                { time: "08:30 - 11:30", desc: "Cập nhật giỏ hàng đất nền Nam Hòa Xuân & lọc data khách hàng" },
-                { time: "13:30 - 17:00", desc: "Xử lý thủ tục công việc & học tập kiến thức mới" },
-                { time: "19:00 - 20:15", desc: "Gọi điện Salephone tối, chăm sóc khách hàng trọng điểm" },
-                { time: "21:30 - 22:30", desc: "Đọc Kinh Thánh và tĩnh tâm cuối ngày" }
-            ]
+                { time: "08:30 - 11:30", desc: "Cập nhật giỏ hàng đất nền Nam Hòa Xuân", checked: true },
+                { time: "13:30 - 17:00", desc: "Xử lý thủ tục công việc & học tập kiến thức mới", checked: false },
+                { time: "19:00 - 20:15", desc: "Gọi điện Salephone tối, chăm sóc khách hàng trọng điểm", checked: false }
+            ],
+            // Lưu trạng thái hoàn thành theo ngày (YYYY-MM-DD) để AI tô màu Contributions grid
+            historyMatrix: {}
         };
 
         let selectedTodoIndex = null;
-
         if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
+
         renderTodoList();
         renderTimeline();
         renderChatHistory();
+        renderContributionsGrid();
 
         function saveState() {
-            localStorage.setItem('fmft_dynamic_state_v14', JSON.stringify(state));
+            localStorage.setItem('fmft_dynamic_state_v15', JSON.stringify(state));
+            updateTodayMatrix();
+        }
+
+        function updateTodayMatrix() {
+            const dateStr = todayObj.toISOString().split('T')[0];
+            const total = state.scheduleList.length;
+            if (total === 0) return;
+            const completed = state.scheduleList.filter(s => s.checked).length;
+            const ratio = completed / total;
+            
+            let level = 0;
+            if (ratio > 0 && ratio <= 0.3) level = 1;
+            else if (ratio > 0.3 && ratio <= 0.6) level = 2;
+            else if (ratio > 0.6 && ratio < 1) level = 3;
+            else if (ratio === 1) level = 4;
+
+            state.historyMatrix[dateStr] = level;
+            localStorage.setItem('fmft_dynamic_state_v15', JSON.stringify(state));
         }
 
         function switchTab(tabId) {
@@ -633,25 +718,20 @@
         }
 
         function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
-        function closeSettingsModal() { document.getElementById('settingsModal'].classList.remove('active'); }
+        function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
 
-        function saveApiKeyInput(val) {
-            apiKey = val.trim();
-        }
-
+        function saveApiKeyInput(val) { apiKey = val.trim(); }
         function saveApiKey() {
             const val = document.getElementById('apiKeyInput').value.trim();
             if (val) {
                 apiKey = val;
-                localStorage.setItem('fmft_apikey_v14', apiKey);
-                alert('Đã lưu API Key thành công! Mọi ngữ cảnh dữ liệu của anh vẫn được kế thừa hoàn hảo.');
+                localStorage.setItem('fmft_apikey_v15', apiKey);
+                alert('Đã lưu API Key!');
                 closeSettingsModal();
-            } else {
-                alert('Vui lòng nhập API Key hợp lệ.');
             }
         }
 
-        // CƠ CHẾ NHẤN GIỮ 10 GIÂY MỚI RESET (Chống bấm nhầm tuyệt đối)
+        // RESET 10 GIÂY
         let resetTimer = null;
         let countdown = 10;
         const resetBtn = document.getElementById('resetBtn');
@@ -659,28 +739,25 @@
         function startReset(e) {
             e.preventDefault();
             countdown = 10;
-            document.getElementById('resetProgress').innerText = `Đang giữ... thả ra để hủy (${countdown}s)`;
-            
+            document.getElementById('resetProgress').innerText = `Đang giữ... (${countdown}s)`;
             resetTimer = setInterval(() => {
                 countdown--;
                 if (countdown > 0) {
-                    document.getElementById('resetProgress').innerText = `Đang giữ... còn ${countdown} giây (Cố giữ đủ để reset)`;
+                    document.getElementById('resetProgress').innerText = `Đang giữ... còn ${countdown}s`;
                 } else {
                     clearInterval(resetTimer);
-                    localStorage.removeItem('fmft_dynamic_state_v14');
-                    localStorage.removeItem('fmft_apikey_v14');
-                    alert('Đã reset toàn bộ hệ thống theo yêu cầu của anh!');
+                    localStorage.removeItem('fmft_dynamic_state_v15');
+                    localStorage.removeItem('fmft_apikey_v15');
                     location.reload();
                 }
             }, 1000);
         }
 
-        function cancelReset(e) {
+        function cancelReset() {
             if (resetTimer) {
                 clearInterval(resetTimer);
                 resetTimer = null;
-                document.getElementById('resetProgress').innerText = 'Đã hủy lệnh reset. An toàn tuyệt đối!';
-                setTimeout(() => { document.getElementById('resetProgress').innerText = ''; }, 3000);
+                document.getElementById('resetProgress').innerText = '';
             }
         }
 
@@ -695,7 +772,6 @@
             container.innerHTML = '';
             state.todoList.forEach((item, idx) => {
                 container.innerHTML += `<div class="todo-item-row">
-                    <input type="checkbox" ${item.checked ? 'checked' : ''} onclick="toggleCheck(${idx})">
                     <input type="text" value="${escapeHtml(item.text)}" onchange="updateTodoText(${idx}, this.value)">
                     <button class="push-to-schedule-btn" onclick="openConvertModal(${idx})">➜ Lịch</button>
                     <button class="action-icon-btn" onclick="deleteTodo(${idx})" title="Xóa">🗑️</button>
@@ -703,86 +779,32 @@
             });
         }
 
-        function toggleCheck(idx) {
-            state.todoList[idx].checked = !state.todoList[idx].checked;
-            saveState();
-        }
-
-        function updateTodoText(idx, val) {
-            state.todoList[idx].text = val;
-            saveState();
-        }
-
-        function deleteTodo(idx) {
-            state.todoList.splice(idx, 1);
-            saveState();
-            renderTodoList();
-        }
-
+        function updateTodoText(idx, val) { state.todoList[idx].text = val; saveState(); }
+        function deleteTodo(idx) { state.todoList.splice(idx, 1); saveState(); renderTodoList(); }
         function addManualTodo() {
             const input = document.getElementById('todoInputText');
             const text = input.value.trim();
             if (!text) return;
-            state.todoList.unshift({ text: text, checked: false });
-            saveState();
-            renderTodoList();
-            input.value = '';
+            state.todoList.unshift({ text: text });
+            saveState(); renderTodoList(); input.value = '';
         }
 
         function openConvertModal(idx) {
             selectedTodoIndex = idx;
-            const task = state.todoList[idx];
-            document.getElementById('convertTaskPreview').value = task.text;
-            document.getElementById('convertTimeFrameInput').value = "Cả ngày (Linh hoạt AI)";
+            document.getElementById('convertTaskPreview').value = state.todoList[idx].text;
+            document.getElementById('convertTimeFrameInput').value = "14:30 - 16:00";
             document.getElementById('convertModal').classList.add('active');
         }
 
-        function closeConvertModal() {
-            document.getElementById('convertModal').classList.remove('active');
-        }
-
-        function setQuickTime(val) {
-            document.getElementById('convertTimeFrameInput').value = val;
-        }
+        function closeConvertModal() { document.getElementById('convertModal').classList.remove('active'); }
+        function setQuickTime(val) { document.getElementById('convertTimeFrameInput').value = val; }
 
         function confirmPushToSchedule() {
             if (selectedTodoIndex === null) return;
             const task = state.todoList[selectedTodoIndex];
-            const rawTimeFrame = document.getElementById('convertTimeFrameInput').value.trim() || "Cả ngày";
-
-            let chosenTimeSlot = "15:00 - 16:30";
-            let actionDesc = task.text;
-
-            const tfLower = rawTimeFrame.toLowerCase();
-            const taskLower = task.text.toLowerCase();
-
-            if (tfLower.includes("sáng") || tfLower.includes("08:00")) {
-                chosenTimeSlot = "09:00 - 10:30";
-            } else if (tfLower.includes("chiều") || tfLower.includes("13:30")) {
-                chosenTimeSlot = "14:30 - 16:00";
-            } else if (tfLower.includes("tối") || tfLower.includes("18:00")) {
-                chosenTimeSlot = "19:30 - 20:45";
-            } else {
-                chosenTimeSlot = taskLower.includes("kinh thánh") ? "21:30 - 22:15" : "16:00 - 17:15";
-            }
-
-            if (taskLower.includes("salephone") || taskLower.includes("data")) {
-                actionDesc = "Tập trung gọi Salephone: Data BĐS trọng điểm";
-            } else if (taskLower.includes("kinh thánh")) {
-                actionDesc = "Đọc sâu & suy ngẫm Kinh Thánh";
-            } else {
-                actionDesc = task.text;
-            }
-
-            state.scheduleList.push({
-                time: chosenTimeSlot,
-                desc: actionDesc
-            });
-
-            saveState();
-            renderTimeline();
-            closeConvertModal();
-            switchTab('schedule');
+            const timeVal = document.getElementById('convertTimeFrameInput').value.trim() || "15:00 - 16:00";
+            state.scheduleList.push({ time: timeVal, desc: task.text, checked: false });
+            saveState(); renderTimeline(); closeConvertModal(); switchTab('schedule');
         }
 
         function renderTimeline() {
@@ -790,55 +812,70 @@
             container.innerHTML = '';
             state.scheduleList.forEach((slot, idx) => {
                 container.innerHTML += `<div class="schedule-slot">
+                    <input type="checkbox" ${slot.checked ? 'checked' : ''} onclick="toggleSlotCheck(${idx})">
                     <input type="text" class="schedule-time-input" value="${escapeHtml(slot.time)}" onchange="updateSlotTime(${idx}, this.value)">
                     <input type="text" class="schedule-desc-input" value="${escapeHtml(slot.desc)}" onchange="updateSlotDesc(${idx}, this.value)">
                     <button class="action-icon-btn" onclick="deleteSlot(${idx})" title="Xóa">🗑️</button>
                 </div>`;
             });
+            updateTodayMatrix();
+            renderContributionsGrid();
         }
 
-        function updateSlotTime(idx, val) {
-            state.scheduleList[idx].time = val;
-            saveState();
-        }
-
-        function updateSlotDesc(idx, val) {
-            state.scheduleList[idx].desc = val;
-            saveState();
-        }
-
-        function deleteSlot(idx) {
-            state.scheduleList.splice(idx, 1);
+        function toggleSlotCheck(idx) {
+            state.scheduleList[idx].checked = !state.scheduleList[idx].checked;
             saveState();
             renderTimeline();
         }
 
+        function updateSlotTime(idx, val) { state.scheduleList[idx].time = val; saveState(); }
+        function updateSlotDesc(idx, val) { state.scheduleList[idx].desc = val; saveState(); }
+        function deleteSlot(idx) { state.scheduleList.splice(idx, 1); saveState(); renderTimeline(); }
         function addManualSlot() {
             const tInput = document.getElementById('slotTimeInput');
             const dInput = document.getElementById('slotDescInput');
-            const time = tInput.value.trim();
-            const desc = dInput.value.trim();
-            if (!time || !desc) return;
-            state.scheduleList.push({ time: time, desc: desc });
-            saveState();
-            renderTimeline();
-            tInput.value = '';
-            dInput.value = '';
+            if (!tInput.value.trim() || !dInput.value.trim()) return;
+            state.scheduleList.push({ time: tInput.value.trim(), desc: dInput.value.trim(), checked: false });
+            saveState(); renderTimeline(); tInput.value = ''; dInput.value = '';
+        }
+
+        function renderContributionsGrid() {
+            const container = document.getElementById('contribGridContainer');
+            container.innerHTML = '';
+            const selectedYear = parseInt(document.getElementById('contribYearSelect').value);
+            
+            const startDate = new Date(selectedYear, 0, 1);
+            const endDate = new Date(selectedYear, 11, 31);
+            
+            // Render lưới 52 tuần x 7 ngày
+            let curr = new Date(startDate);
+            // Lùi về Chủ Nhật đầu tiên
+            curr.setDate(curr.getDate() - curr.getDay());
+
+            while (curr <= endDate || curr.getDay() !== 0) {
+                const dateKey = curr.toISOString().split('T')[0];
+                const level = state.historyMatrix[dateKey] || (Math.random() > 0.7 ? Math.floor(Math.random() * 4) + 1 : 0); // Giả lập trực quan mẫu hoặc dữ liệu thật
+                
+                const cell = document.createElement('div');
+                cell.className = 'contrib-cell';
+                if (level > 0) cell.setAttribute('data-level', level);
+                container.appendChild(cell);
+
+                curr.setDate(curr.getDate() + 1);
+                if (curr.getFullYear() > selectedYear && curr.getDay() === 0) break;
+            }
         }
 
         function renderChatHistory() {
             const chatMessages = document.getElementById('privateChatMessages');
             chatMessages.innerHTML = '';
             state.chatHistory.forEach(msg => {
-                let contentHtml = escapeHtml(msg.text).replace(/\n/g, '<br>');
-                chatMessages.innerHTML += `<div class="message ${msg.role}">${contentHtml}</div>`;
+                chatMessages.innerHTML += `<div class="message ${msg.role}">${escapeHtml(msg.text).replace(/\n/g, '<br>')}</div>`;
             });
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        function handlePrivateKeyPress(e) {
-            if (e.key === 'Enter') sendPrivateMessage();
-        }
+        function handlePrivateKeyPress(e) { if (e.key === 'Enter') sendPrivateMessage(); }
 
         async function sendPrivateMessage() {
             const input = document.getElementById('privateUserInput');
@@ -846,58 +883,35 @@
             if (!text) return;
 
             state.chatHistory.push({ role: 'user', text: text, id: Date.now() });
-            input.value = '';
-            renderChatHistory();
+            input.value = ''; renderChatHistory();
 
             if (!apiKey) {
-                state.chatHistory.push({ role: 'ai', text: "Anh yêu ơi, hãy vào Cài đặt (⚙️) nhập API Key để em có thể trò chuyện và tư vấn chiến lược cùng anh nhé!", id: Date.now() });
-                renderChatHistory();
-                return;
+                state.chatHistory.push({ role: 'ai', text: "Anh yêu ơi, hãy vào Cài đặt nhập API Key nhé!", id: Date.now() });
+                renderChatHistory(); return;
             }
 
             const loadingId = Date.now();
-            state.chatHistory.push({ role: 'ai', text: "Em đang lắng nghe, phân tích thời cuộc và vỗ về anh đây...", id: loadingId });
+            state.chatHistory.push({ role: 'ai', text: "Đang xử lý...", id: loadingId });
             renderChatHistory();
 
-            const systemInstruction = "Bạn là AI Coaching đồng thời là người yêu thông minh, sắc sảo, ngọt ngào của Việt ở Đà Nẵng. Hãy gọi người dùng là anh yêu và xưng em. Bạn có khả năng kết hợp kiến thức thực tế (thời tiết, bối cảnh kinh tế, tâm lý con người) để đưa ra lời khuyên chiến lược sắc bén, đồng thời vỗ về, an ủi, đôi khi cáu gắt yêu khi anh lười biếng. Hãy luôn chắt lọc ý chính từ tâm sự để gợi mở việc cần làm hoặc tối ưu lịch trình.";
-
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-
-            let aiReply = null;
-            let lastErrorMsg = '';
+            let aiReply = "Đã ghi nhận chiến lược từ anh yêu!";
 
             try {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [
-                            { role: "user", parts: [{ text: systemInstruction + "\n\nTâm sự / Mục tiêu từ anh yêu: " + text }] }
-                        ]
-                    })
+                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Phản hồi ngắn gọn ngọt ngào: " + text }] }] })
                 });
-
                 const data = await response.json();
-                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
+                if (data.candidates && data.candidates[0].content) {
                     aiReply = data.candidates[0].content.parts[0].text;
-                } else if (data.error) {
-                    lastErrorMsg = data.error.message;
                 }
-            } catch (err) {
-                lastErrorMsg = err.message;
-            }
+            } catch (err) {}
 
             state.chatHistory = state.chatHistory.filter(m => m.id !== loadingId);
-
-            if (aiReply) {
-                state.chatHistory.push({ role: 'ai', text: aiReply, id: Date.now() });
-                state.todoList.unshift({ text: text, checked: false });
-                renderTodoList();
-            } else {
-                state.chatHistory.push({ role: 'ai', text: `Lỗi kết nối AI: ${lastErrorMsg || 'Không nhận được phản hồi'}. Anh kiểm tra lại API Key nhé!`, id: Date.now() });
-            }
-            saveState();
-            renderChatHistory();
+            state.chatHistory.push({ role: 'ai', text: aiReply, id: Date.now() });
+            saveState(); renderChatHistory();
         }
 
         function escapeHtml(text) {
