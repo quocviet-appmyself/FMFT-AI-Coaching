@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FMFT AI Coaching - Dynamic Living OS</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -23,6 +23,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Xóa hoàn toàn layer màu xanh khi bấm trên mobile */
         }
 
         body {
@@ -97,6 +98,8 @@
             flex: 1;
             overflow-y: auto;
             padding: 12px;
+            display: flex;
+            flex-direction: column;
         }
 
         .main-scroll-area::-webkit-scrollbar {
@@ -105,6 +108,7 @@
 
         .tab-content {
             display: none;
+            flex: 1;
         }
 
         .tab-content.active {
@@ -233,7 +237,6 @@
             margin: 8px 0 6px 2px;
         }
 
-        /* Việc cần làm (Bỏ checklist, chỉ còn text đại ý) */
         .todo-item-row {
             display: flex;
             align-items: center;
@@ -276,7 +279,6 @@
             white-space: nowrap;
         }
 
-        /* Lịch trình hôm nay (Thêm checkbox đen) */
         .schedule-slot {
             display: flex;
             gap: 4px;
@@ -289,7 +291,7 @@
         }
 
         .schedule-slot input[type="checkbox"] {
-            accent-color: #111; /* Tick màu đen đồng bộ */
+            accent-color: #111;
             width: 14px;
             height: 14px;
             cursor: pointer;
@@ -359,20 +361,21 @@
             flex-shrink: 0;
         }
 
-        /* GitHub Contributions Grid Styling (Read-only AI Report) */
+        /* GITHUB CONTRIBUTIONS GRID STYLING (Chỉ hiện ở Tab Lịch trình, ghim sát footer) */
         .contrib-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 10px;
             border-radius: 12px;
-            margin-bottom: 12px;
+            margin-top: auto; /* Ghim sát xuống đáy trước footer */
+            margin-bottom: 4px;
         }
 
         .contrib-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .contrib-title {
@@ -391,18 +394,48 @@
             font-weight: 600;
         }
 
-        .contrib-grid-wrapper {
+        .contrib-layout {
+            display: flex;
+            gap: 6px;
+            align-items: flex-start;
+        }
+
+        .contrib-days-label {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 8px;
+            color: var(--text-muted);
+            height: 91px; /* 7 hàng x 10px + khoảng cách */
+            padding-top: 14px; /* Chừa chỗ cho hàng số tuần phía trên */
+            text-align: right;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        .contrib-main-content {
+            flex: 1;
             overflow-x: auto;
             padding-bottom: 4px;
         }
 
-        .contrib-grid-wrapper::-webkit-scrollbar {
+        .contrib-main-content::-webkit-scrollbar {
             height: 3px;
         }
 
-        .contrib-grid-wrapper::-webkit-scrollbar-thumb {
+        .contrib-main-content::-webkit-scrollbar-thumb {
             background: #ccc;
             border-radius: 3px;
+        }
+
+        .contrib-weeks-header {
+            display: grid;
+            grid-auto-flow: column;
+            gap: 3px;
+            font-size: 7px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+            height: 12px;
         }
 
         .contrib-grid {
@@ -419,7 +452,6 @@
             background-color: #ebedf0;
         }
 
-        /* Thang màu GitHub chuẩn */
         .contrib-cell[data-level="1"] { background-color: #9be9a8; }
         .contrib-cell[data-level="2"] { background-color: #40c463; }
         .contrib-cell[data-level="3"] { background-color: #30a14e; }
@@ -508,7 +540,7 @@
         <header>
             <div class="logo">FMFT AI <span>OS</span></div>
             <div class="header-icons">
-                <button class="icon-btn" onclick="triggerSmartNotification()" title="Gấu yêu tương tác thời gian thực">💖</button>
+                <button class="icon-btn" onclick="triggerSmartNotification()" title="Gấu yêu tương tác">💖</button>
                 <button class="icon-btn" onclick="openSettingsModal()">⚙️</button>
             </div>
         </header>
@@ -526,7 +558,7 @@
                         <span class="push-time" id="pushTimeDisplay">Bây giờ</span>
                     </div>
                     <div class="push-body" id="pushNotificationText">
-                        "Anh yêu ơi, hoàn thành tốt các mốc lịch trình hôm nay nhé! Em luôn theo sát và chấm điểm năng suất cho anh đó! 😘"
+                        "Hoàn thành xuất sắc các mốc lịch trình hôm nay để bảng điểm danh xanh mướt nhé anh yêu! 😘"
                     </div>
                 </div>
 
@@ -540,6 +572,26 @@
                         <button onclick="addManualSlot()">Thêm</button>
                     </div>
                 </div>
+
+                <!-- GITHUB CONTRIBUTIONS GRID (Chỉ hiển thị ở tab Lịch trình, ghim sát footer) -->
+                <div class="contrib-card">
+                    <div class="contrib-header">
+                        <span class="contrib-title">AI Productivity Contributions</span>
+                        <select id="contribYearSelect" class="contrib-year-select" onchange="renderContributionsGrid()"></select>
+                    </div>
+                    <div class="contrib-layout">
+                        <div class="contrib-days-label">
+                            <span>Sun</span>
+                            <span>Tue</span>
+                            <span>Thu</span>
+                            <span>Sat</span>
+                        </div>
+                        <div class="contrib-main-content">
+                            <div class="contrib-weeks-header" id="contribWeeksHeader"></div>
+                            <div class="contrib-grid" id="contribGridContainer"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- TAB 2: KẾ HOẠCH -->
@@ -551,7 +603,7 @@
                     <div class="chat-box">
                         <div class="chat-messages" id="privateChatMessages">
                             <div class="message ai">
-                                Chào anh yêu Việt! Cần than thở, xốc lại tinh thần hay trao đổi chiến lược sống cứ nói em nghe nhé! ❤️
+                                Chào anh yêu Việt! Cần trao đổi chiến lược hay tâm sự cứ nói em nghe nhé! ❤️
                             </div>
                         </div>
                         <div class="chat-input-area">
@@ -568,20 +620,6 @@
                         <input type="text" id="todoInputText" placeholder="Thêm việc cần làm đại ý..." style="flex:1; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
                         <button onclick="addManualTodo()" style="background:var(--accent-dark); color:#fff; border:none; padding:0 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Thêm</button>
                     </div>
-                </div>
-            </div>
-
-            <!-- GITHUB-STYLE CONTRIBUTIONS GRID (Sát phía trên Footer) -->
-            <div class="contrib-card">
-                <div class="contrib-header">
-                    <span class="contrib-title">AI Productivity Contributions</span>
-                    <select id="contribYearSelect" class="contrib-year-select" onchange="renderContributionsGrid()">
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                    </select>
-                </div>
-                <div class="contrib-grid-wrapper">
-                    <div class="contrib-grid" id="contribGridContainer"></div>
                 </div>
             </div>
 
@@ -654,43 +692,48 @@
         document.getElementById('dateStringDisplay').innerText = `Hôm nay: ${daysOfWeek[todayObj.getDay()]} (${todayObj.toLocaleDateString('vi-VN')})`;
 
         const smartContextualNotifications = [
-            "\"Anh yêu ơi, hoàn thành tốt các mục tiêu BĐS và lịch trình hôm nay nhé! 😘\"",
-            "\"Đang giờ làm việc nghiêm túc đấy nhé anh yêu! Cố gắng giữ vững phong độ! ✨\""
+            "\"Hoàn thành tốt lịch trình hôm nay để bảng Contributions sáng rực nhé anh yêu! 😘\"",
+            "\"Năng suất hôm nay sẽ quyết định độ mướt của biểu đồ điểm danh đấy, cố lên! ✨\""
         ];
 
         function triggerSmartNotification() {
-            const randomMsg = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
             document.getElementById('pushTimeDisplay').innerText = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('pushNotificationText').innerHTML = randomMsg;
+            document.getElementById('pushNotificationText').innerHTML = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
         }
 
-        let apiKey = localStorage.getItem('fmft_apikey_v15') || '';
-        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v15')) || {
+        // Khởi tạo bộ nhớ riêng biệt cho Contributions (Không bị xóa khi reset hệ thống)
+        let contributionsMatrix = JSON.parse(localStorage.getItem('fmft_contributions_persistent_v1')) || {};
+        
+        let apiKey = localStorage.getItem('fmft_apikey_v16') || '';
+        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v16')) || {
             chatHistory: [],
             todoList: [
-                { text: "Tập trung 80% thời gian tối cho Salephone & mở rộng data BĐS" },
+                { text: "Tập trung tối đa cho Salephone & mở rộng data BĐS Nam Hòa Xuân" },
                 { text: "Đọc Kinh Thánh & duy trì kỷ luật bản thân" }
             ],
             scheduleList: [
                 { time: "08:30 - 11:30", desc: "Cập nhật giỏ hàng đất nền Nam Hòa Xuân", checked: true },
                 { time: "13:30 - 17:00", desc: "Xử lý thủ tục công việc & học tập kiến thức mới", checked: false },
                 { time: "19:00 - 20:15", desc: "Gọi điện Salephone tối, chăm sóc khách hàng trọng điểm", checked: false }
-            ],
-            // Lưu trạng thái hoàn thành theo ngày (YYYY-MM-DD) để AI tô màu Contributions grid
-            historyMatrix: {}
+            ]
         };
 
         let selectedTodoIndex = null;
         if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
 
+        initYearSelect();
         renderTodoList();
         renderTimeline();
         renderChatHistory();
         renderContributionsGrid();
 
         function saveState() {
-            localStorage.setItem('fmft_dynamic_state_v15', JSON.stringify(state));
+            localStorage.setItem('fmft_dynamic_state_v16', JSON.stringify(state));
             updateTodayMatrix();
+        }
+
+        function saveContributions() {
+            localStorage.setItem('fmft_contributions_persistent_v1', JSON.stringify(contributionsMatrix));
         }
 
         function updateTodayMatrix() {
@@ -706,8 +749,25 @@
             else if (ratio > 0.6 && ratio < 1) level = 3;
             else if (ratio === 1) level = 4;
 
-            state.historyMatrix[dateStr] = level;
-            localStorage.setItem('fmft_dynamic_state_v15', JSON.stringify(state));
+            if (level > 0) {
+                contributionsMatrix[dateStr] = level;
+            } else {
+                delete contributionsMatrix[dateStr];
+            }
+            saveContributions();
+        }
+
+        function initYearSelect() {
+            const select = document.getElementById('contribYearSelect');
+            select.innerHTML = '';
+            const currentYear = new Date().getFullYear();
+            // Cho phép chọn năm hiện tại và các năm về trước (từ 2024 đến nay)
+            for (let y = currentYear; y >= 2024; y--) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.innerText = y;
+                select.appendChild(opt);
+            }
         }
 
         function switchTab(tabId) {
@@ -725,13 +785,13 @@
             const val = document.getElementById('apiKeyInput').value.trim();
             if (val) {
                 apiKey = val;
-                localStorage.setItem('fmft_apikey_v15', apiKey);
-                alert('Đã lưu API Key!');
+                localStorage.setItem('fmft_apikey_v16', apiKey);
+                alert('Đã lưu API Key thành công!');
                 closeSettingsModal();
             }
         }
 
-        // RESET 10 GIÂY
+        // RESET 10 GIÂY (Chỉ reset kế hoạch, việc làm, lịch trình... Contributions vẫn được bảo vệ)
         let resetTimer = null;
         let countdown = 10;
         const resetBtn = document.getElementById('resetBtn');
@@ -746,8 +806,10 @@
                     document.getElementById('resetProgress').innerText = `Đang giữ... còn ${countdown}s`;
                 } else {
                     clearInterval(resetTimer);
-                    localStorage.removeItem('fmft_dynamic_state_v15');
-                    localStorage.removeItem('fmft_apikey_v15');
+                    localStorage.removeItem('fmft_dynamic_state_v16');
+                    localStorage.removeItem('fmft_apikey_v16');
+                    // Lưu ý: Không xóa 'fmft_contributions_persistent_v1' để giữ lại lịch sử báo cáo
+                    alert('Đã reset hệ thống chiến lược! Lịch sử Contributions vẫn được giữ nguyên vẹn.');
                     location.reload();
                 }
             }, 1000);
@@ -840,26 +902,37 @@
         }
 
         function renderContributionsGrid() {
-            const container = document.getElementById('contribGridContainer');
-            container.innerHTML = '';
+            const gridContainer = document.getElementById('contribGridContainer');
+            const weeksHeader = document.getElementById('contribWeeksHeader');
+            gridContainer.innerHTML = '';
+            weeksHeader.innerHTML = '';
+
             const selectedYear = parseInt(document.getElementById('contribYearSelect').value);
-            
             const startDate = new Date(selectedYear, 0, 1);
             const endDate = new Date(selectedYear, 11, 31);
             
-            // Render lưới 52 tuần x 7 ngày
             let curr = new Date(startDate);
-            // Lùi về Chủ Nhật đầu tiên
-            curr.setDate(curr.getDate() - curr.getDay());
+            curr.setDate(curr.getDate() - curr.getDay()); // Lùi về Chủ Nhật đầu tiên
 
+            let weekCount = 0;
             while (curr <= endDate || curr.getDay() !== 0) {
+                if (curr.getDay() === 0) {
+                    weekCount++;
+                    // Đánh dấu số tuần phía trên (hiện mỗi 4 tuần hoặc tuần đầu)
+                    const wSpan = document.createElement('div');
+                    if (weekCount === 1 || weekCount % 4 === 0) {
+                        wSpan.innerText = weekCount;
+                    }
+                    weeksHeader.appendChild(wSpan);
+                }
+
                 const dateKey = curr.toISOString().split('T')[0];
-                const level = state.historyMatrix[dateKey] || (Math.random() > 0.7 ? Math.floor(Math.random() * 4) + 1 : 0); // Giả lập trực quan mẫu hoặc dữ liệu thật
+                const level = contributionsMatrix[dateKey] || 0;
                 
                 const cell = document.createElement('div');
                 cell.className = 'contrib-cell';
                 if (level > 0) cell.setAttribute('data-level', level);
-                container.appendChild(cell);
+                gridContainer.appendChild(cell);
 
                 curr.setDate(curr.getDate() + 1);
                 if (curr.getFullYear() > selectedYear && curr.getDay() === 0) break;
@@ -891,17 +964,17 @@
             }
 
             const loadingId = Date.now();
-            state.chatHistory.push({ role: 'ai', text: "Đang xử lý...", id: loadingId });
+            state.chatHistory.push({ role: 'ai', text: "Đang phân tích...", id: loadingId });
             renderChatHistory();
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-            let aiReply = "Đã ghi nhận chiến lược từ anh yêu!";
+            let aiReply = "Đã lưu tâm sự từ anh yêu!";
 
             try {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Phản hồi ngắn gọn ngọt ngào: " + text }] }] })
+                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Phản hồi ngắn gọn ngọt ngào sắc sảo: " + text }] }] })
                 });
                 const data = await response.json();
                 if (data.candidates && data.candidates[0].content) {
