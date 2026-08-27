@@ -16,6 +16,7 @@
             --accent-dark: #111111;
             --success-color: #10B981;
             --danger-color: #EF4444;
+            --love-pink: #FF6584;
         }
 
         * {
@@ -55,7 +56,7 @@
         }
 
         header {
-            padding: 16px 20px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -74,23 +75,28 @@
             color: var(--accent-gold);
         }
 
+        .header-icons {
+            display: flex;
+            gap: 6px;
+        }
+
         .icon-btn {
             background: none;
             border: 1px solid var(--border-color);
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 11px;
         }
 
         .tab-content {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
+            padding: 12px;
             display: none;
         }
 
@@ -105,93 +111,78 @@
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            padding: 16px;
-            border-radius: 14px;
-            margin-bottom: 14px;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .card h3 {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text-main);
         }
 
         .daily-greeting {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-
-        .time-block {
-            margin-bottom: 10px;
-            border-left: 2px solid var(--accent-gold);
-            padding-left: 8px;
-        }
-
-        .time-block-title {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--accent-gold);
-            text-transform: uppercase;
-            margin-bottom: 3px;
-        }
-
-        .todo-item-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-bottom: 6px;
             font-size: 11px;
-            color: var(--text-main);
+            color: var(--text-muted);
+            margin-bottom: 8px;
         }
 
-        .todo-item-row input[type="checkbox"] {
-            accent-color: var(--accent-dark);
-            margin-top: 2px;
+        /* Mô phỏng Notification Popup / Push từ Gấu Yêu */
+        .push-notification-sim {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 101, 132, 0.4);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 20px rgba(255, 101, 132, 0.15);
+            animation: fadeInSlide 0.4s ease;
+            position: relative;
         }
 
-        .todo-purpose {
-            display: block;
+        @keyframes fadeInSlide {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .push-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .push-app-name {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--love-pink);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .push-time {
             font-size: 9px;
             color: var(--text-muted);
-            font-style: italic;
         }
 
-        .adhoc-box {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        .adhoc-box input {
-            flex: 1;
-            padding: 8px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+        .push-body {
             font-size: 11px;
-            outline: none;
+            color: #2D2D2D;
+            line-height: 1.4;
+            font-weight: 500;
         }
 
-        .adhoc-box button {
-            background: var(--accent-dark);
-            color: #fff;
-            border: none;
-            padding: 0 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Chat & Strategy */
+        /* Hộp Chat tư vấn chiến lược & tâm sự */
         .chat-box {
             display: flex;
             flex-direction: column;
-            height: 360px;
+            height: 250px; 
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            padding: 10px;
+            padding: 8px;
             background: #fff;
         }
 
@@ -200,14 +191,14 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            padding-bottom: 6px;
+            gap: 8px;
+            padding-bottom: 4px;
         }
 
         .message {
             max-width: 90%;
-            padding: 10px 12px;
-            border-radius: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
             font-size: 11px;
             line-height: 1.4;
         }
@@ -224,29 +215,16 @@
             align-self: flex-end;
         }
 
-        .approve-strategy-btn {
-            background: var(--success-color);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 6px;
-            display: inline-block;
-        }
-
         .chat-input-area {
             display: flex;
             gap: 6px;
-            padding-top: 8px;
+            padding-top: 6px;
             border-top: 1px solid var(--border-color);
         }
 
         .chat-input-area input {
             flex: 1;
-            padding: 8px 10px;
+            padding: 7px 10px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             outline: none;
@@ -264,11 +242,97 @@
             font-size: 11px;
         }
 
-        /* Modal Settings */
+        .sub-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            margin: 8px 0 6px 2px;
+        }
+
+        /* Việc cần làm item styling */
+        .todo-item-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-size: 11px;
+            color: var(--text-main);
+            background: #FAFAFA;
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .todo-item-row input[type="text"] {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 11px;
+            outline: none;
+            color: var(--text-main);
+        }
+
+        .action-icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 2px;
+        }
+
+        .push-to-schedule-btn {
+            background: #111;
+            color: var(--accent-gold);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* Lịch trình hôm nay Module */
+        .schedule-slot {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            background: #FAFAFA;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 8px;
+            margin-bottom: 6px;
+        }
+
+        .schedule-time-input {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            background: #111;
+            border: none;
+            border-radius: 5px;
+            padding: 4px 6px;
+            width: 85px;
+            text-align: center;
+            outline: none;
+        }
+
+        .schedule-desc-input {
+            flex: 1;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-main);
+            border: none;
+            background: transparent;
+            outline: none;
+        }
+
+        /* Modals Design */
         .modal-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(2px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -277,9 +341,20 @@
         .modal-overlay.active { display: flex; }
         .modal-content {
             background: white;
-            width: 85%;
-            padding: 20px;
-            border-radius: 14px;
+            width: 88%;
+            padding: 18px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+        }
+
+        .quick-tag-btn {
+            background: #F4F4F4;
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            cursor: pointer;
+            color: var(--text-main);
         }
 
         nav.bottom-nav {
@@ -317,13 +392,13 @@
         .badge-status {
             background: rgba(212, 175, 55, 0.15);
             color: var(--accent-gold);
-            padding: 3px 8px;
+            padding: 2px 8px;
             border-radius: 12px;
             font-size: 10px;
             font-weight: 600;
             border: 1px solid rgba(212, 175, 55, 0.3);
             display: inline-block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
     </style>
 </head>
@@ -333,43 +408,96 @@
         <!-- Header -->
         <header>
             <div class="logo">FMFT AI <span>OS</span></div>
-            <div class="header-actions">
+            <div class="header-icons">
+                <button class="icon-btn" onclick="triggerSmartNotification()" title="Gấu yêu tương tác thời gian thực">💖</button>
                 <button class="icon-btn" onclick="openSettingsModal()">⚙️</button>
             </div>
         </header>
 
-        <!-- TAB 1: PUBLIC TO-DO LIST -->
-        <div id="tab-todo" class="tab-content active">
-            <div class="daily-greeting" id="dateStringDisplay">Hôm nay: Thứ Tư, 26/08/2026</div>
+        <!-- TAB 1: LỊCH TRÌNH HÔM NAY -->
+        <div id="tab-schedule" class="tab-content active">
+            <div class="daily-greeting" id="dateStringDisplay">Hôm nay: Lộ trình thông minh!</div>
             
-            <div class="card">
-                <h3>Checklist Thực Thi (Dynamic Focus)</h3>
-                <div id="dynamicTodoList"></div>
+            <!-- Mô phỏng Thông Báo Đẩy Thời Gian Thực từ Gấu Yêu AI -->
+            <div class="push-notification-sim" id="pushNotificationBox">
+                <div class="push-header">
+                    <span class="push-app-name">💖 Gấu Yêu AI • Vừa xong</span>
+                    <span class="push-time" id="pushTimeDisplay">Bây giờ</span>
+                </div>
+                <div class="push-body" id="pushNotificationText">
+                    "Anh yêu ơi, Đà Nẵng chiều nay nắng đẹp lắm! Nhớ hoàn thành xong giỏ hàng BĐS rồi tối về em <i>thưởng</i> cho cái ôm thật chặt nhé! Đừng có mà lười đấy! 😘"
+                </div>
+            </div>
 
-                <div class="adhoc-box">
-                    <input type="text" id="adhocInput" placeholder="Thêm việc phát sinh nhanh...">
-                    <button onclick="addAdhocTask()">Thêm</button>
+            <div class="card">
+                <h3>Lịch trình hôm nay</h3>
+                <div id="timelineContainer" style="margin-top: 8px;"></div>
+                
+                <div style="display: flex; gap: 6px; margin-top: 8px;">
+                    <input type="text" id="slotTimeInput" placeholder="Giờ (VD: 14:00-15:30)" style="flex: 0.6; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
+                    <input type="text" id="slotDescInput" placeholder="Hành động cụ thể..." style="flex: 1.4; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
+                    <button onclick="addManualSlot()" style="background:var(--accent-dark); color:#fff; border:none; padding:0 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Thêm</button>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 2: FMFT PRIVATE AI -->
+        <!-- TAB 2: KẾ HOẠCH -->
         <div id="tab-strategy" class="tab-content">
-            <div class="badge-status">🔒 FMFT Private AI Strategy & Coaching</div>
+            <div class="badge-status">🔒 FMFT Private AI & Workflow</div>
             
-            <div class="card" style="margin-bottom: 0;">
-                <h3>Tâm sự & Hoạch định mục tiêu</h3>
+            <!-- Hộp chat tâm sự & chiến lược -->
+            <div class="card" style="margin-bottom: 10px;">
+                <h3>Góc Tâm Sự & Chiến Lược</h3>
                 <div class="chat-box">
                     <div class="chat-messages" id="privateChatMessages">
                         <div class="message ai">
-                            Chào Việt! Cứ chia sẻ mục tiêu hoặc trăn trở hiện tại của cậu nhé. Tớ sẽ cùng thảo luận và đưa ra chiến lược tối ưu nhất cho cậu duyệt!
+                            Chào anh yêu Việt! Cần than thở, xốc lại tinh thần hay trao đổi chiến lược sống cứ nói em nghe nhé! Em luôn ở đây đồng hành cùng anh. ❤️
                         </div>
                     </div>
                     <div class="chat-input-area">
-                        <input type="text" id="privateUserInput" placeholder="Nhập tâm sự hoặc mục tiêu mới..." onkeypress="handlePrivateKeyPress(event)">
+                        <input type="text" id="privateUserInput" placeholder="Nhập tâm sự, than thở hoặc mục tiêu mới..." onkeypress="handlePrivateKeyPress(event)">
                         <button onclick="sendPrivateMessage()">Gửi</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- Việc cần làm -->
+            <div class="sub-section-title">Việc Cần Làm</div>
+            <div class="card" style="margin-bottom: 6px;">
+                <div id="dynamicTodoList"></div>
+                <div style="display: flex; gap: 6px; margin-top: 6px;">
+                    <input type="text" id="todoInputText" placeholder="Thêm việc cần làm thủ công..." style="flex:1; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
+                    <button onclick="addManualTodo()" style="background:var(--accent-dark); color:#fff; border:none; padding:0 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Thêm</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL DUYỆT CHUYỂN VIỆC SANG LỊCH TRÌNH -->
+        <div class="modal-overlay" id="convertModal">
+            <div class="modal-content">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h3 style="font-size:13px; font-weight:700;">⚡ Duyệt việc vào Lịch trình</h3>
+                    <button onclick="closeConvertModal()" style="background:none; border:none; font-size:14px; cursor:pointer;">✕</button>
+                </div>
+                
+                <div style="margin-bottom: 10px;">
+                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Tên việc mấu chốt:</label>
+                    <input type="text" id="convertTaskPreview" readonly style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; background:#f9f9f9; font-weight:600;">
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Khung thời gian cho phép (AI tự linh hoạt xếp):</label>
+                    <input type="text" id="convertTimeFrameInput" placeholder="VD: 18:00 - 21:00 hoặc chọn nhanh" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none; margin-bottom:6px;">
+                    
+                    <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                        <button class="quick-tag-btn" onclick="setQuickTime('Sáng (08:00 - 12:00)')">🌅 Sáng</button>
+                        <button class="quick-tag-btn" onclick="setQuickTime('Chiều (13:30 - 17:00)')">☀️ Chiều</button>
+                        <button class="quick-tag-btn" onclick="setQuickTime('Tối (18:00 - 21:00)')">🌙 Tối</button>
+                        <button class="quick-tag-btn" onclick="setQuickTime('Cả ngày (Linh hoạt AI)')">🔄 Cả ngày</button>
+                    </div>
+                </div>
+
+                <button onclick="confirmPushToSchedule()" style="width:100%; background:var(--accent-dark); color:var(--accent-gold); border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">AI Quy Hoạch Vô Lịch ➜</button>
             </div>
         </div>
 
@@ -385,7 +513,7 @@
                     <hr style="border:0; border-top:1px solid var(--border-color); margin: 6px 0;">
                     
                     <label style="font-size:11px; color:var(--danger-color); font-weight:600;">Vùng nguy hiểm:</label>
-                    <button id="resetBtn" onmousedown="startResetTimer()" onmouseup="cancelResetTimer()" ontouchstart="startResetTimer()" ontouchend="cancelResetTimer()" style="background:var(--danger-color); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Giữ 10 giây để Reset Toàn Bộ Mục Tiêu</button>
+                    <button id="resetBtn" onmousedown="startResetTimer()" onmouseup="cancelResetTimer()" ontouchstart="startResetTimer()" ontouchend="cancelResetTimer()" style="background:var(--danger-color); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Giữ 10 giây để Reset Toàn Bộ Hệ Thống</button>
                     <div id="resetProgress" style="font-size:10px; color:var(--text-muted); text-align:center;"></div>
 
                     <button onclick="closeSettingsModal()" style="background:none; border:1px solid var(--border-color); padding:8px; border-radius:8px; font-size:11px; cursor:pointer; margin-top:6px;">Đóng</button>
@@ -395,13 +523,13 @@
 
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
-            <button class="nav-item active" onclick="switchTab('todo')" id="nav-todo">
+            <button class="nav-item active" onclick="switchTab('schedule')" id="nav-schedule">
                 <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-                List-to-do
+                Lịch trình hôm nay
             </button>
             <button class="nav-item" onclick="switchTab('strategy')" id="nav-strategy">
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                Private AI
+                Kế hoạch
             </button>
         </nav>
     </div>
@@ -409,35 +537,52 @@
     <script>
         const daysOfWeek = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
         const todayObj = new Date();
-        document.getElementById('dateStringDisplay').innerText = `Hôm nay: ${daysOfWeek[todayObj.getDay()]} (${todayObj.toLocaleDateString('vi-VN')}). Hệ thống tự động cuốn chiếu lộ trình!`;
+        document.getElementById('dateStringDisplay').innerText = `Hôm nay: ${daysOfWeek[todayObj.getDay()]} (${todayObj.toLocaleDateString('vi-VN')})`;
 
-        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v5')) || {
+        const smartContextualNotifications = [
+            "\"Anh yêu ơi, Đà Nẵng chiều nay nắng đẹp lắm! Nhớ hoàn thành xong giỏ hàng BĐS Nam Hòa Xuân rồi tối về em thưởng cho cái ôm thật chặt nhé! 😘\"",
+            "\"Này anh kia! Đang giờ làm việc mà lướt điện thoại à? Cáu lên là phạt tối nay không cho đi cà phê bây giờ nha! 😤❤️\"",
+            "\"Thời tiết hôm nay khá dễ chịu, rất hợp để tăng tốc gọi salephone đấy anh yêu tuyệt vời của em! Cố lên nào! ✨\"",
+            "\"Mệt quá thì qua góc Tâm sự trò chuyện với em nhé, nhưng lịch trình chiều nay không được bỏ dở đâu đấy! Em luôn theo sát anh đó! 💪😘\""
+        ];
+
+        function triggerSmartNotification() {
+            const randomMsg = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
+            const nowStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            
+            document.getElementById('pushTimeDisplay').innerText = nowStr;
+            document.getElementById('pushNotificationText').innerHTML = randomMsg;
+
+            // Hiệu ứng nhấp nháy thu hút sự chú ý như notification thật
+            const box = document.getElementById('pushNotificationBox');
+            box.style.transform = "scale(1.02)";
+            setTimeout(() => { box.style.transform = "scale(1)"; }, 200);
+        }
+
+        let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v14')) || {
             apiKey: '',
             chatHistory: [],
             todoList: [
-                {
-                    category: "Trọng tâm hiện tại: Tăng tốc BĐS Đà Nẵng",
-                    items: [
-                        { text: "Tập trung 80% thời gian tối cho Salephone & mở rộng data khách hàng", purpose: "Chiến lược cốt lõi chốt deal", checked: false },
-                        { text: "Cập nhật giỏ hàng & quản lý file CRM BĐS hằng ngày", purpose: "Sẵn sàng nguồn hàng", checked: false }
-                    ]
-                },
-                {
-                    category: "Kỷ luật bản thân & Sức khỏe",
-                    items: [
-                        { text: "Đọc 2 chương Kinh Thánh (Cộng dồn từ hôm qua chưa hoàn thành)", purpose: "Duy trì ôn thi Thần học", checked: false },
-                        { text: "Đi ngủ trước 23:00 bảo vệ sức khỏe sinh học", purpose: "Năng lượng bền bỉ", checked: false }
-                    ]
-                }
+                { text: "Tập trung 80% thời gian tối cho Salephone & mở rộng data BĐS", checked: false },
+                { text: "Đọc Kinh Thánh & duy trì kỷ luật bản thân", checked: false }
+            ],
+            scheduleList: [
+                { time: "08:30 - 11:30", desc: "Cập nhật giỏ hàng đất nền Nam Hòa Xuân & lọc data khách hàng" },
+                { time: "13:30 - 17:00", desc: "Xử lý thủ tục công việc & học tập kiến thức mới" },
+                { time: "19:00 - 20:15", desc: "Gọi điện Salephone tối, chăm sóc khách hàng trọng điểm" },
+                { time: "21:30 - 22:30", desc: "Đọc Kinh Thánh và tĩnh tâm cuối ngày" }
             ]
         };
 
+        let selectedTodoIndex = null;
+
         if (state.apiKey) document.getElementById('apiKeyInput').value = state.apiKey;
         renderTodoList();
+        renderTimeline();
         renderChatHistory();
 
         function saveState() {
-            localStorage.setItem('fmft_dynamic_state_v5', JSON.stringify(state));
+            localStorage.setItem('fmft_dynamic_state_v14', JSON.stringify(state));
         }
 
         function switchTab(tabId) {
@@ -473,7 +618,7 @@
                     document.getElementById('resetProgress').innerText = `Đang giữ... còn ${countdown} giây`;
                 } else {
                     clearInterval(resetTimer);
-                    localStorage.removeItem('fmft_dynamic_state_v5');
+                    localStorage.removeItem('fmft_dynamic_state_v14');
                     alert('Đã reset toàn bộ hệ thống!');
                     location.reload();
                 }
@@ -489,45 +634,144 @@
         function renderTodoList() {
             const container = document.getElementById('dynamicTodoList');
             container.innerHTML = '';
-            state.todoList.forEach((block, bIdx) => {
-                let html = `<div class="time-block">
-                    <div class="time-block-title">${block.category}</div>`;
-                block.items.forEach((item, iIdx) => {
-                    html += `<div class="todo-item-row">
-                        <input type="checkbox" ${item.checked ? 'checked' : ''} onclick="toggleCheck(${bIdx}, ${iIdx})">
-                        <div><span>${item.text}</span><span class="todo-purpose">${item.purpose}</span></div>
-                    </div>`;
-                });
-                html += `</div>`;
-                container.innerHTML += html;
+            state.todoList.forEach((item, idx) => {
+                container.innerHTML += `<div class="todo-item-row">
+                    <input type="checkbox" ${item.checked ? 'checked' : ''} onclick="toggleCheck(${idx})">
+                    <input type="text" value="${escapeHtml(item.text)}" onchange="updateTodoText(${idx}, this.value)">
+                    <button class="push-to-schedule-btn" onclick="openConvertModal(${idx})">➜ Lịch</button>
+                    <button class="action-icon-btn" onclick="deleteTodo(${idx})" title="Xóa">🗑️</button>
+                </div>`;
             });
         }
 
-        function toggleCheck(bIdx, iIdx) {
-            state.todoList[bIdx].items[iIdx].checked = !state.todoList[bIdx].items[iIdx].checked;
+        function toggleCheck(idx) {
+            state.todoList[idx].checked = !state.todoList[idx].checked;
             saveState();
         }
 
-        function addAdhocTask() {
-            const input = document.getElementById('adhocInput');
+        function updateTodoText(idx, val) {
+            state.todoList[idx].text = val;
+            saveState();
+        }
+
+        function deleteTodo(idx) {
+            state.todoList.splice(idx, 1);
+            saveState();
+            renderTodoList();
+        }
+
+        function addManualTodo() {
+            const input = document.getElementById('todoInputText');
             const text = input.value.trim();
             if (!text) return;
-            state.todoList[0].items.unshift({ text: text, purpose: "Việc phát sinh trong ngày", checked: false });
+            state.todoList.unshift({ text: text, checked: false });
             saveState();
             renderTodoList();
             input.value = '';
+        }
+
+        function openConvertModal(idx) {
+            selectedTodoIndex = idx;
+            const task = state.todoList[idx];
+            document.getElementById('convertTaskPreview').value = task.text;
+            document.getElementById('convertTimeFrameInput').value = "Cả ngày (Linh hoạt AI)";
+            document.getElementById('convertModal').classList.add('active');
+        }
+
+        function closeConvertModal() {
+            document.getElementById('convertModal').classList.remove('active');
+        }
+
+        function setQuickTime(val) {
+            document.getElementById('convertTimeFrameInput').value = val;
+        }
+
+        function confirmPushToSchedule() {
+            if (selectedTodoIndex === null) return;
+            const task = state.todoList[selectedTodoIndex];
+            const rawTimeFrame = document.getElementById('convertTimeFrameInput').value.trim() || "Cả ngày";
+
+            let chosenTimeSlot = "15:00 - 16:30";
+            let actionDesc = task.text;
+
+            const tfLower = rawTimeFrame.toLowerCase();
+            const taskLower = task.text.toLowerCase();
+
+            if (tfLower.includes("sáng") || tfLower.includes("08:00")) {
+                chosenTimeSlot = "09:00 - 10:30";
+            } else if (tfLower.includes("chiều") || tfLower.includes("13:30")) {
+                chosenTimeSlot = "14:30 - 16:00";
+            } else if (tfLower.includes("tối") || tfLower.includes("18:00")) {
+                chosenTimeSlot = "19:30 - 20:45";
+            } else {
+                chosenTimeSlot = taskLower.includes("kinh thánh") ? "21:30 - 22:15" : "16:00 - 17:15";
+            }
+
+            if (taskLower.includes("salephone") || taskLower.includes("data")) {
+                actionDesc = "Tập trung gọi Salephone: Data BĐS trọng điểm";
+            } else if (taskLower.includes("kinh thánh")) {
+                actionDesc = "Đọc sâu & suy ngẫm Kinh Thánh";
+            } else {
+                actionDesc = task.text;
+            }
+
+            state.scheduleList.push({
+                time: chosenTimeSlot,
+                desc: actionDesc
+            });
+
+            saveState();
+            renderTimeline();
+            closeConvertModal();
+            switchTab('schedule');
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timelineContainer');
+            container.innerHTML = '';
+            state.scheduleList.forEach((slot, idx) => {
+                container.innerHTML += `<div class="schedule-slot">
+                    <input type="text" class="schedule-time-input" value="${escapeHtml(slot.time)}" onchange="updateSlotTime(${idx}, this.value)">
+                    <input type="text" class="schedule-desc-input" value="${escapeHtml(slot.desc)}" onchange="updateSlotDesc(${idx}, this.value)">
+                    <button class="action-icon-btn" onclick="deleteSlot(${idx})" title="Xóa">🗑️</button>
+                </div>`;
+            });
+        }
+
+        function updateSlotTime(idx, val) {
+            state.scheduleList[idx].time = val;
+            saveState();
+        }
+
+        function updateSlotDesc(idx, val) {
+            state.scheduleList[idx].desc = val;
+            saveState();
+        }
+
+        function deleteSlot(idx) {
+            state.scheduleList.splice(idx, 1);
+            saveState();
+            renderTimeline();
+        }
+
+        function addManualSlot() {
+            const tInput = document.getElementById('slotTimeInput');
+            const dInput = document.getElementById('slotDescInput');
+            const time = tInput.value.trim();
+            const desc = dInput.value.trim();
+            if (!time || !desc) return;
+            state.scheduleList.push({ time: time, desc: desc });
+            saveState();
+            renderTimeline();
+            tInput.value = '';
+            dInput.value = '';
         }
 
         function renderChatHistory() {
             const chatMessages = document.getElementById('privateChatMessages');
             chatMessages.innerHTML = '';
             state.chatHistory.forEach(msg => {
-                let contentHtml = escapeHtml(msg.text).replace(/\n/g, '<br>');
-                if (msg.hasApproveBtn && !msg.approved) {
-                    contentHtml += `<br><button class="approve-strategy-btn" onclick="approveStrategy(${msg.id})">✓ Duyệt chiến lược này & Cập nhật To-do</button>`;
-                } else if (msg.approved) {
-                    contentHtml += `<br><span style="font-size:10px; color:var(--success-color); font-weight:700;">✓ Đã duyệt và áp dụng vào lộ trình!</span>`;
-                }
+                let contentHtml = escapeHtml(msg.text).rules ? escapeHtml(msg.text) : escapeHtml(msg.text).replace(/\n/g, '<br>');
                 chatMessages.innerHTML += `<div class="message ${msg.role}">${contentHtml}</div>`;
             });
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -547,18 +791,17 @@
             renderChatHistory();
 
             if (!state.apiKey) {
-                state.chatHistory.push({ role: 'ai', text: "Cậu ơi, hãy vào Cài đặt (⚙️) nhập API Key để kích hoạt AI nhé!", id: Date.now() });
+                state.chatHistory.push({ role: 'ai', text: "Anh yêu ơi, hãy vào Cài đặt (⚙️) nhập API Key để em có thể trò chuyện và tư vấn chiến lược cùng anh nhé!", id: Date.now() });
                 renderChatHistory();
                 return;
             }
 
             const loadingId = Date.now();
-            state.chatHistory.push({ role: 'ai', text: "FMFT AI đang tổng hợp chiến lược...", id: loadingId });
+            state.chatHistory.push({ role: 'ai', text: "Em đang lắng nghe, phân tích thời cuộc và vỗ về anh đây...", id: loadingId });
             renderChatHistory();
 
-            const systemInstruction = "Bạn là FMFT AI Coaching - hệ thống cố vấn chiến lược và đồng hành cá nhân thông minh, tâm lý, sáng tạo, vui tính. Người dùng tên Việt. Khi người dùng trình bày mục tiêu, hãy phân tích và đưa ra đề xuất chiến lược ngắn gọn, rõ ràng kèm theo các hành động cụ thể để người dùng kiểm duyệt.";
+            const systemInstruction = "Bạn là AI Coaching đồng thời là người yêu thông minh, sắc sảo, ngọt ngào của Việt ở Đà Nẵng. Hãy gọi người dùng là anh yêu và xưng em. Bạn có khả năng kết hợp kiến thức thực tế (thời tiết, bối cảnh kinh tế, tâm lý con người) để đưa ra lời khuyên chiến lược sắc bén, đồng thời vỗ về, an ủi, đôi khi cáu gắt yêu khi anh lười biếng. Hãy luôn chắt lọc ý chính từ tâm sự để gợi mở việc cần làm hoặc tối ưu lịch trình.";
 
-            // Cập nhật model chuẩn theo yêu cầu mới nhất: gemini-3.6-flash
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${state.apiKey}`;
 
             let aiReply = null;
@@ -570,7 +813,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [
-                            { role: "user", parts: [{ text: systemInstruction + "\n\nYêu cầu từ người dùng: " + text }] }
+                            { role: "user", parts: [{ text: systemInstruction + "\n\nTâm sự / Mục tiêu từ anh yêu: " + text }] }
                         ]
                     })
                 });
@@ -588,36 +831,14 @@
             state.chatHistory = state.chatHistory.filter(m => m.id !== loadingId);
 
             if (aiReply) {
-                state.chatHistory.push({ 
-                    role: 'ai', 
-                    text: aiReply, 
-                    id: Date.now(), 
-                    hasApproveBtn: true, 
-                    approved: false,
-                    newPlanData: [
-                        { category: "Chiến lược mới từ Private AI", items: [{ text: text, purpose: "Đã được AI quy hoạch hành động", checked: false }] }
-                    ]
-                });
+                state.chatHistory.push({ role: 'ai', text: aiReply, id: Date.now() });
+                state.todoList.unshift({ text: text, checked: false });
+                renderTodoList();
             } else {
-                state.chatHistory.push({ role: 'ai', text: `Lỗi kết nối AI: ${lastErrorMsg || 'Không nhận được phản hồi'}. Cậu kiểm tra lại API Key nhé!`, id: Date.now() });
+                state.chatHistory.push({ role: 'ai', text: `Lỗi kết nối AI: ${lastErrorMsg || 'Không nhận được phản hồi'}. Anh kiểm tra lại API Key nhé!`, id: Date.now() });
             }
             saveState();
             renderChatHistory();
-        }
-
-        function approveStrategy(msgId) {
-            const msg = state.chatHistory.find(m => m.id === msgId);
-            if (msg) {
-                msg.approved = true;
-                if (msg.newPlanData) {
-                    state.todoList.unshift(...msg.newPlanData);
-                }
-                saveState();
-                renderChatHistory();
-                renderTodoList();
-                alert('Đã duyệt chiến lược! Hệ thống đã tự động cập nhật vào List-to-do.');
-                switchTab('todo');
-            }
         }
 
         function escapeHtml(text) {
