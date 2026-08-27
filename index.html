@@ -23,7 +23,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Xóa hoàn toàn layer màu xanh khi bấm trên mobile */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -109,10 +109,12 @@
         .tab-content {
             display: none;
             flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .tab-content.active {
-            display: block;
+            display: flex;
         }
 
         .card {
@@ -361,21 +363,23 @@
             flex-shrink: 0;
         }
 
-        /* GITHUB CONTRIBUTIONS GRID STYLING (Chỉ hiện ở Tab Lịch trình, ghim sát footer) */
+        /* GITHUB CONTRIBUTIONS GRID (Cố định dưới cùng trong tab Lịch trình) */
+        .contrib-wrapper {
+            margin-top: auto; /* Đẩy xuống sát đáy */
+        }
+
         .contrib-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 10px;
             border-radius: 12px;
-            margin-top: auto; /* Ghim sát xuống đáy trước footer */
-            margin-bottom: 4px;
         }
 
         .contrib-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .contrib-title {
@@ -384,30 +388,21 @@
             color: var(--text-main);
         }
 
-        .contrib-year-select {
-            background: #FAFAFA;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 10px;
-            padding: 2px 6px;
-            outline: none;
-            font-weight: 600;
-        }
-
         .contrib-layout {
             display: flex;
             gap: 6px;
             align-items: flex-start;
         }
 
+        /* Cố định đúng 7 hàng cho 7 thứ trong tuần */
         .contrib-days-label {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             font-size: 8px;
             color: var(--text-muted);
-            height: 91px; /* 7 hàng x 10px + khoảng cách */
-            padding-top: 14px; /* Chừa chỗ cho hàng số tuần phía trên */
+            height: 91px; 
+            padding-top: 14px; /* Chừa chỗ chuẩn xác cho hàng tên tháng phía trên */
             text-align: right;
             flex-shrink: 0;
             font-weight: 600;
@@ -428,7 +423,7 @@
             border-radius: 3px;
         }
 
-        .contrib-weeks-header {
+        .contrib-months-header {
             display: grid;
             grid-auto-flow: column;
             gap: 3px;
@@ -436,6 +431,7 @@
             color: var(--text-muted);
             margin-bottom: 2px;
             height: 12px;
+            white-space: nowrap;
         }
 
         .contrib-grid {
@@ -573,22 +569,26 @@
                     </div>
                 </div>
 
-                <!-- GITHUB CONTRIBUTIONS GRID (Chỉ hiển thị ở tab Lịch trình, ghim sát footer) -->
-                <div class="contrib-card">
-                    <div class="contrib-header">
-                        <span class="contrib-title">AI Productivity Contributions</span>
-                        <select id="contribYearSelect" class="contrib-year-select" onchange="renderContributionsGrid()"></select>
-                    </div>
-                    <div class="contrib-layout">
-                        <div class="contrib-days-label">
-                            <span>Sun</span>
-                            <span>Tue</span>
-                            <span>Thu</span>
-                            <span>Sat</span>
+                <!-- GITHUB CONTRIBUTIONS GRID (Cố định ở dưới cùng) -->
+                <div class="contrib-wrapper">
+                    <div class="contrib-card">
+                        <div class="contrib-header">
+                            <span class="contrib-title">AI Productivity Contributions</span>
                         </div>
-                        <div class="contrib-main-content">
-                            <div class="contrib-weeks-header" id="contribWeeksHeader"></div>
-                            <div class="contrib-grid" id="contribGridContainer"></div>
+                        <div class="contrib-layout">
+                            <div class="contrib-days-label">
+                                <span>Sun</span>
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                            </div>
+                            <div class="contrib-main-content">
+                                <div class="contrib-months-header" id="contribMonthsHeader"></div>
+                                <div class="contrib-grid" id="contribGridContainer"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -701,7 +701,6 @@
             document.getElementById('pushNotificationText').innerHTML = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
         }
 
-        // Khởi tạo bộ nhớ riêng biệt cho Contributions (Không bị xóa khi reset hệ thống)
         let contributionsMatrix = JSON.parse(localStorage.getItem('fmft_contributions_persistent_v1')) || {};
         
         let apiKey = localStorage.getItem('fmft_apikey_v16') || '';
@@ -721,7 +720,6 @@
         let selectedTodoIndex = null;
         if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
 
-        initYearSelect();
         renderTodoList();
         renderTimeline();
         renderChatHistory();
@@ -757,19 +755,6 @@
             saveContributions();
         }
 
-        function initYearSelect() {
-            const select = document.getElementById('contribYearSelect');
-            select.innerHTML = '';
-            const currentYear = new Date().getFullYear();
-            // Cho phép chọn năm hiện tại và các năm về trước (từ 2024 đến nay)
-            for (let y = currentYear; y >= 2024; y--) {
-                const opt = document.createElement('option');
-                opt.value = y;
-                opt.innerText = y;
-                select.appendChild(opt);
-            }
-        }
-
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
@@ -791,7 +776,6 @@
             }
         }
 
-        // RESET 10 GIÂY (Chỉ reset kế hoạch, việc làm, lịch trình... Contributions vẫn được bảo vệ)
         let resetTimer = null;
         let countdown = 10;
         const resetBtn = document.getElementById('resetBtn');
@@ -808,7 +792,6 @@
                     clearInterval(resetTimer);
                     localStorage.removeItem('fmft_dynamic_state_v16');
                     localStorage.removeItem('fmft_apikey_v16');
-                    // Lưu ý: Không xóa 'fmft_contributions_persistent_v1' để giữ lại lịch sử báo cáo
                     alert('Đã reset hệ thống chiến lược! Lịch sử Contributions vẫn được giữ nguyên vẹn.');
                     location.reload();
                 }
@@ -901,41 +884,55 @@
             saveState(); renderTimeline(); tInput.value = ''; dInput.value = '';
         }
 
+        // RENDER GITHUB CONTRIBUTIONS GRID CHUẨN TÊN THÁNG & LỊCH THỰC TẾ 1 NĂM TRỞ VỀ TRƯỚC
         function renderContributionsGrid() {
             const gridContainer = document.getElementById('contribGridContainer');
-            const weeksHeader = document.getElementById('contribWeeksHeader');
+            const monthsHeader = document.getElementById('contribMonthsHeader');
             gridContainer.innerHTML = '';
-            weeksHeader.innerHTML = '';
+            monthsHeader.innerHTML = '';
 
-            const selectedYear = parseInt(document.getElementById('contribYearSelect').value);
-            const startDate = new Date(selectedYear, 0, 1);
-            const endDate = new Date(selectedYear, 11, 31);
-            
+            const endDate = new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate());
+            const startDate = new Date(endDate);
+            startDate.setDate(startDate.getDate() - 364); // Lùi về đúng 1 năm trước
+
+            // Lùi tiếp startDate về ngày Chủ Nhật đầu tiên để khung lưới bắt đầu hoàn hảo
             let curr = new Date(startDate);
-            curr.setDate(curr.getDate() - curr.getDay()); // Lùi về Chủ Nhật đầu tiên
+            curr.setDate(curr.getDate() - curr.getDay());
 
-            let weekCount = 0;
-            while (curr <= endDate || curr.getDay() !== 0) {
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            let lastMonthPrinted = -1;
+            let colIndex = 0;
+
+            while (curr <= endDate) {
+                // Xác định tên tháng hiển thị ở cột đầu tiên của mỗi tháng trong tuần (Chủ nhật)
                 if (curr.getDay() === 0) {
-                    weekCount++;
-                    // Đánh dấu số tuần phía trên (hiện mỗi 4 tuần hoặc tuần đầu)
-                    const wSpan = document.createElement('div');
-                    if (weekCount === 1 || weekCount % 4 === 0) {
-                        wSpan.innerText = weekCount;
+                    const mSpan = document.createElement('div');
+                    const mNum = curr.getMonth();
+                    // Chỉ in tên tháng nếu khác tháng trước đó và đủ chỗ trống
+                    if (mNum !== lastMonthPrinted) {
+                        mSpan.innerText = monthNames[mNum];
+                        lastMonthPrinted = mNum;
+                    } else {
+                        mSpan.innerText = "";
                     }
-                    weeksHeader.appendChild(wSpan);
+                    monthsHeader.appendChild(mSpan);
                 }
 
                 const dateKey = curr.toISOString().split('T')[0];
-                const level = contributionsMatrix[dateKey] || 0;
-                
                 const cell = document.createElement('div');
                 cell.className = 'contrib-cell';
-                if (level > 0) cell.setAttribute('data-level', level);
+
+                // Chỉ hiển thị dữ liệu từ hôm nay trở về quá khứ, tương lai bỏ trống
+                if (curr <= endDate) {
+                    const level = contributionsMatrix[dateKey] || 0;
+                    if (level > 0) cell.setAttribute('data-level', level);
+                } else {
+                    cell.style.visibility = 'hidden'; // Ẩn các ngày tương lai
+                }
+
                 gridContainer.appendChild(cell);
 
                 curr.setDate(curr.getDate() + 1);
-                if (curr.getFullYear() > selectedYear && curr.getDay() === 0) break;
             }
         }
 
