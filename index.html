@@ -292,15 +292,15 @@
             white-space: nowrap;
         }
 
-        /* Lịch trình hôm nay Module */
+        /* Lịch trình hôm nay Module - Fix tràn màn hình */
         .schedule-slot {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             align-items: center;
             background: #FAFAFA;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 6px 8px;
+            padding: 6px;
             margin-bottom: 6px;
         }
 
@@ -311,10 +311,11 @@
             background: #111;
             border: none;
             border-radius: 5px;
-            padding: 4px 6px;
-            width: 85px;
+            padding: 4px;
+            width: 75px;
             text-align: center;
             outline: none;
+            flex-shrink: 0;
         }
 
         .schedule-desc-input {
@@ -325,6 +326,45 @@
             border: none;
             background: transparent;
             outline: none;
+            min-width: 0;
+        }
+
+        .schedule-add-box {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .schedule-add-box input:nth-child(1) {
+            width: 80px;
+            flex-shrink: 0;
+            padding: 6px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 10px;
+            outline: none;
+        }
+
+        .schedule-add-box input:nth-child(2) {
+            flex: 1;
+            min-width: 0;
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 11px;
+            outline: none;
+        }
+
+        .schedule-add-box button {
+            background: var(--accent-dark);
+            color: #fff;
+            border: none;
+            padding: 0 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            flex-shrink: 0;
         }
 
         /* Modals Design */
@@ -433,10 +473,10 @@
                 <h3>Lịch trình hôm nay</h3>
                 <div id="timelineContainer" style="margin-top: 8px;"></div>
                 
-                <div style="display: flex; gap: 6px; margin-top: 8px;">
-                    <input type="text" id="slotTimeInput" placeholder="Giờ (VD: 14:00-15:30)" style="flex: 0.6; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
-                    <input type="text" id="slotDescInput" placeholder="Hành động cụ thể..." style="flex: 1.4; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
-                    <button onclick="addManualSlot()" style="background:var(--accent-dark); color:#fff; border:none; padding:0 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Thêm</button>
+                <div class="schedule-add-box">
+                    <input type="text" id="slotTimeInput" placeholder="Giờ (VD: 14:00)">
+                    <input type="text" id="slotDescInput" placeholder="Hành động cụ thể...">
+                    <button onclick="addManualSlot()">Thêm</button>
                 </div>
             </div>
         </div>
@@ -507,14 +547,14 @@
                 <h3 style="margin-bottom: 12px;">Cài đặt hệ thống</h3>
                 <div style="display:flex; flex-direction:column; gap:10px;">
                     <label style="font-size:11px; color:var(--text-muted);">Gemini API Key:</label>
-                    <input type="password" id="apiKeyInput" placeholder="Dán API Key vào đây..." style="padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
+                    <input type="password" id="apiKeyInput" placeholder="Dán API Key vào đây..." style="padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;" onchange="saveApiKeyInput(this.value)">
                     <button onclick="saveApiKey()" style="background:var(--accent-dark); color:#fff; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Lưu API Key</button>
                     
                     <hr style="border:0; border-top:1px solid var(--border-color); margin: 6px 0;">
                     
                     <label style="font-size:11px; color:var(--danger-color); font-weight:600;">Vùng nguy hiểm:</label>
-                    <button id="resetBtn" onmousedown="startResetTimer()" onmouseup="cancelResetTimer()" ontouchstart="startResetTimer()" ontouchend="cancelResetTimer()" style="background:var(--danger-color); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Giữ 10 giây để Reset Toàn Bộ Hệ Thống</button>
-                    <div id="resetProgress" style="font-size:10px; color:var(--text-muted); text-align:center;"></div>
+                    <button id="resetBtn" style="background:var(--danger-color); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; user-select: none;">Nhấn và GIỮ TRONG 10 GIÂY để Reset Toàn Bộ</button>
+                    <div id="resetProgress" style="font-size:10px; color:var(--text-muted); text-align:center; font-weight:600;"></div>
 
                     <button onclick="closeSettingsModal()" style="background:none; border:1px solid var(--border-color); padding:8px; border-radius:8px; font-size:11px; cursor:pointer; margin-top:6px;">Đóng</button>
                 </div>
@@ -553,14 +593,14 @@
             document.getElementById('pushTimeDisplay').innerText = nowStr;
             document.getElementById('pushNotificationText').innerHTML = randomMsg;
 
-            // Hiệu ứng nhấp nháy thu hút sự chú ý như notification thật
             const box = document.getElementById('pushNotificationBox');
             box.style.transform = "scale(1.02)";
             setTimeout(() => { box.style.transform = "scale(1)"; }, 200);
         }
 
+        // Tách riêng biệt API Key và State dữ liệu để bảo vệ dữ liệu khi update code
+        let apiKey = localStorage.getItem('fmft_apikey_v14') || '';
         let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v14')) || {
-            apiKey: '',
             chatHistory: [],
             todoList: [
                 { text: "Tập trung 80% thời gian tối cho Salephone & mở rộng data BĐS", checked: false },
@@ -576,7 +616,7 @@
 
         let selectedTodoIndex = null;
 
-        if (state.apiKey) document.getElementById('apiKeyInput').value = state.apiKey;
+        if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
         renderTodoList();
         renderTimeline();
         renderChatHistory();
@@ -593,43 +633,62 @@
         }
 
         function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
-        function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
+        function closeSettingsModal() { document.getElementById('settingsModal'].classList.remove('active'); }
+
+        function saveApiKeyInput(val) {
+            apiKey = val.trim();
+        }
 
         function saveApiKey() {
             const val = document.getElementById('apiKeyInput').value.trim();
             if (val) {
-                state.apiKey = val;
-                saveState();
-                alert('Đã lưu API Key thành công!');
+                apiKey = val;
+                localStorage.setItem('fmft_apikey_v14', apiKey);
+                alert('Đã lưu API Key thành công! Mọi ngữ cảnh dữ liệu của anh vẫn được kế thừa hoàn hảo.');
                 closeSettingsModal();
             } else {
                 alert('Vui lòng nhập API Key hợp lệ.');
             }
         }
 
+        // CƠ CHẾ NHẤN GIỮ 10 GIÂY MỚI RESET (Chống bấm nhầm tuyệt đối)
         let resetTimer = null;
         let countdown = 10;
-        function startResetTimer() {
+        const resetBtn = document.getElementById('resetBtn');
+
+        function startReset(e) {
+            e.preventDefault();
             countdown = 10;
             document.getElementById('resetProgress').innerText = `Đang giữ... thả ra để hủy (${countdown}s)`;
+            
             resetTimer = setInterval(() => {
                 countdown--;
                 if (countdown > 0) {
-                    document.getElementById('resetProgress').innerText = `Đang giữ... còn ${countdown} giây`;
+                    document.getElementById('resetProgress').innerText = `Đang giữ... còn ${countdown} giây (Cố giữ đủ để reset)`;
                 } else {
                     clearInterval(resetTimer);
                     localStorage.removeItem('fmft_dynamic_state_v14');
-                    alert('Đã reset toàn bộ hệ thống!');
+                    localStorage.removeItem('fmft_apikey_v14');
+                    alert('Đã reset toàn bộ hệ thống theo yêu cầu của anh!');
                     location.reload();
                 }
             }, 1000);
         }
-        function cancelResetTimer() {
+
+        function cancelReset(e) {
             if (resetTimer) {
                 clearInterval(resetTimer);
-                document.getElementById('resetProgress').innerText = '';
+                resetTimer = null;
+                document.getElementById('resetProgress').innerText = 'Đã hủy lệnh reset. An toàn tuyệt đối!';
+                setTimeout(() => { document.getElementById('resetProgress').innerText = ''; }, 3000);
             }
         }
+
+        resetBtn.addEventListener('mousedown', startReset);
+        resetBtn.addEventListener('mouseup', cancelReset);
+        resetBtn.addEventListener('mouseleave', cancelReset);
+        resetBtn.addEventListener('touchstart', startReset);
+        resetBtn.addEventListener('touchend', cancelReset);
 
         function renderTodoList() {
             const container = document.getElementById('dynamicTodoList');
@@ -771,7 +830,7 @@
             const chatMessages = document.getElementById('privateChatMessages');
             chatMessages.innerHTML = '';
             state.chatHistory.forEach(msg => {
-                let contentHtml = escapeHtml(msg.text).rules ? escapeHtml(msg.text) : escapeHtml(msg.text).replace(/\n/g, '<br>');
+                let contentHtml = escapeHtml(msg.text).replace(/\n/g, '<br>');
                 chatMessages.innerHTML += `<div class="message ${msg.role}">${contentHtml}</div>`;
             });
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -790,7 +849,7 @@
             input.value = '';
             renderChatHistory();
 
-            if (!state.apiKey) {
+            if (!apiKey) {
                 state.chatHistory.push({ role: 'ai', text: "Anh yêu ơi, hãy vào Cài đặt (⚙️) nhập API Key để em có thể trò chuyện và tư vấn chiến lược cùng anh nhé!", id: Date.now() });
                 renderChatHistory();
                 return;
@@ -802,7 +861,7 @@
 
             const systemInstruction = "Bạn là AI Coaching đồng thời là người yêu thông minh, sắc sảo, ngọt ngào của Việt ở Đà Nẵng. Hãy gọi người dùng là anh yêu và xưng em. Bạn có khả năng kết hợp kiến thức thực tế (thời tiết, bối cảnh kinh tế, tâm lý con người) để đưa ra lời khuyên chiến lược sắc bén, đồng thời vỗ về, an ủi, đôi khi cáu gắt yêu khi anh lười biếng. Hãy luôn chắt lọc ý chính từ tâm sự để gợi mở việc cần làm hoặc tối ưu lịch trình.";
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${state.apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
             let aiReply = null;
             let lastErrorMsg = '';
