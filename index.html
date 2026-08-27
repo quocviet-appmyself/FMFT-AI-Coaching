@@ -576,8 +576,8 @@
                 
                 <div class="push-notification-sim" id="pushNotificationBox">
                     <div class="push-header">
-                        <span class="push-app-name">💖 Gấu Yêu AI • Vừa xong</span>
-                        <span class="push-time" id="pushTimeDisplay">Bây giờ</span>
+                        <span class="push-app-name">💖 Gấu Yêu AI</span>
+                        <span class="push-time" id="pushTimeDisplay">Vừa xong</span>
                     </div>
                     <div class="push-body" id="pushNotificationText">
                         "Hoàn thành xuất sắc các mốc lịch trình hôm nay để bảng điểm danh sáng rực nhé anh yêu! 😘"
@@ -720,8 +720,27 @@
             "\"Năng suất hôm nay sẽ quyết định độ mướt của biểu đồ điểm danh đấy, cố lên! ✨\""
         ];
 
+        let notificationTimestamp = Date.now();
+
+        function updateDynamicPushTime() {
+            const diffMs = Date.now() - notificationTimestamp;
+            const diffMins = Math.floor(diffMs / 60000);
+            const timeEl = document.getElementById('pushTimeDisplay');
+            
+            if (diffMins < 1) {
+                timeEl.innerText = "Vừa xong";
+            } else if (diffMins < 60) {
+                timeEl.innerText = `${diffMins} phút trước`;
+            } else {
+                const diffHours = Math.floor(diffMins / 60);
+                timeEl.innerText = `${diffHours} giờ trước`;
+            }
+        }
+        setInterval(updateDynamicPushTime, 30000); // Cập nhật thời gian trôi qua mỗi 30 giây
+
         function triggerSmartNotification() {
-            document.getElementById('pushTimeDisplay').innerText = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            notificationTimestamp = Date.now();
+            document.getElementById('pushTimeDisplay').innerText = "Vừa xong";
             document.getElementById('pushNotificationText').innerHTML = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
         }
 
@@ -935,7 +954,7 @@
             renderContributionsGrid(selectedYear);
         }
         
-        // 1. XIN PHÉP VÀ KÍCH HOẠT THÔNG BẢO ĐẨY (WEB PUSH / NOTIFICATIONS)
+        // XIN PHÉP VÀ KÍCH HOẠT THÔNG BẢO ĐẨY RA MÀN HÌNH THỰC TẾ
         async function requestNotificationPermission() {
             if (!("Notification" in window)) {
                 alert("Trình duyệt của anh không hỗ trợ thông báo đẩy trực tiếp!");
@@ -949,34 +968,29 @@
                     icon: "https://cdn-icons-png.flaticon.com/512/2583/2583344.png"
                 });
             } else {
-                alert("Anh chưa cấp quyền thông báo, hãy bật lại trong cài đặt trình duyệt để Gấu nhắc việc nhé!");
+                alert("Anh chưa cấp quyền thông báo, hãy bật lại trong cài đặt để Gấu nhắc việc nhé!");
             }
         }
 
-        // 2. HỆ THỐNG QUÉT LỊCH VÀ NHẮC NHỞ TỰ ĐỘNG (BACKGROUND CHIEF)
+        // HỆ THỐNG QUÉT LỊCH VÀ ĐẨY THÔNG BẢO RA MÀN HÌNH ĐIỆN THOẠI TRƯỚC 5 PHÚT
         function checkScheduleAlerts() {
             const now = new Date();
             const currentHours = now.getHours();
             const currentMinutes = now.getMinutes();
-            const currentTimeStr = `${String(currentHours).padStart(2, '0')}:${String(currentMinutes).padStart(2, '0')}`;
 
-            // Quét qua danh sách lịch trình xem có mốc nào sắp đến (cách đúng 5 phút)
             state.scheduleList.forEach(slot => {
-                // Định dạng time dạng "15:00 - 16:00" hoặc "16:00"
                 const parts = slot.time.split('-');
                 if (parts.length > 0) {
-                    const startTime = parts[0].trim(); // Lấy giờ bắt đầu VD: "16:00"
+                    const startTime = parts[0].trim();
                     const [startH, startM] = startTime.split(':').map(Number);
                     
                     if (!isNaN(startH) && !isNaN(startM)) {
-                        // Tính số phút chênh lệch
                         const targetTotalMinutes = startH * 60 + startM;
                         const currentTotalMinutes = currentHours * 60 + currentMinutes;
                         const diffMinutes = targetTotalMinutes - currentTotalMinutes;
 
-                        // Nếu đúng còn lại 5 phút nữa đến giờ thực hiện task!
                         if (diffMinutes === 5 && !slot.notified) {
-                            slot.notified = true; // Đánh dấu đã báo để không lặp lại
+                            slot.notified = true;
                             saveState();
 
                             const loveMessages = [
@@ -986,7 +1000,7 @@
                             ];
                             const randomMsg = loveMessages[Math.floor(Math.random() * loveMessages.length)];
 
-                            // Bắn thông báo đẩy ra màn hình (ngay cả khi thoát app nếu PWA active)
+                            // Bắn thông báo đẩy ra ngoài màn hình thiết bị
                             if (Notification.permission === "granted") {
                                 navigator.serviceWorker ? 
                                     navigator.serviceWorker.ready.then(reg => {
@@ -999,8 +1013,8 @@
                                     new Notification("💖 Gấu Yêu AI Nhắc Nhở", { body: randomMsg });
                             }
 
-                            // Đồng thời hiện thị ngay trong UI của app
-                            document.getElementById('pushTimeDisplay').innerText = currentTimeStr;
+                            notificationTimestamp = Date.now();
+                            document.getElementById('pushTimeDisplay').innerText = "Vừa xong";
                             document.getElementById('pushNotificationText').innerText = `"${randomMsg}"`;
                         }
                     }
@@ -1008,10 +1022,8 @@
             });
         }
 
-        // Chạy bộ đếm kiểm tra mỗi phút một lần
         setInterval(checkScheduleAlerts, 60000);
 
-        // RENDER ĐÚNG CHUẨN MÙNG 1 VÀ TỐI ƯU Ô 4px, GAP 1.2px
         function renderContributionsGrid(year) {
             const gridContainer = document.getElementById('contribGridContainer');
             const monthsHeader = document.getElementById('contribMonthsHeader');
@@ -1022,14 +1034,13 @@
             const endDate = new Date(year, 11, 31);
 
             let curr = new Date(startDate);
-            curr.setDate(curr.getDate() - curr.getDay()); // Lùi về Chủ Nhật đầu tuần
+            curr.setDate(curr.getDate() - curr.getDay());
 
             let colIndex = 0;
             const monthMap = {}; 
             const monthNamesEnglish = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
             while (curr <= endDate || curr.getDay() !== 0) {
-                // Quét xem cột tuần này có chứa ngày mùng 1 của tháng nào không
                 for (let d = 0; d < 7; d++) {
                     const checkDate = new Date(curr);
                     checkDate.setDate(checkDate.getDate() + d);
@@ -1042,14 +1053,12 @@
                     }
                 }
 
-                // Vẽ 7 ô của cột
                 for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
                     const cellDate = new Date(curr);
                     const cell = document.createElement('div');
                     cell.className = 'contrib-cell';
 
                     if (cellDate.getFullYear() === year) {
-                        // Sửa lại đoạn tạo dateKey chuẩn local time trong hàm renderContributionsGrid:
                         const yyyy = cellDate.getFullYear();
                         const mm = String(cellDate.getMonth() + 1).padStart(2, '0');
                         const dd = String(cellDate.getDate()).padStart(2, '0');
@@ -1066,7 +1075,7 @@
                             cell.classList.add('is-first-of-month');
                         }
 
-                        cell.title = `${dateKey}: Level ${level}${isFirstDay ? ` (Mùng 1 tháng ${cellDate.getMonth() + 1})` : ''}`;
+                        cell.title = `${dateKey}: Level ${level}`;
                     } else {
                         cell.classList.add('out-of-year');
                     }
@@ -1078,12 +1087,10 @@
                 if (curr > endDate && curr.getDay() === 0) break;
             }
 
-            // Tạo thanh tiêu đề tháng chuẩn flex phân bổ đều
             for (let m = 0; m < 12; m++) {
                 const mSpan = document.createElement('div');
                 mSpan.className = 'contrib-month-label';
                 mSpan.innerText = monthNamesEnglish[m];
-                if (monthMap[m] === undefined && m === 0) monthMap[0] = 0;
                 monthsHeader.appendChild(mSpan);
             }
         }
