@@ -23,7 +23,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Xóa hoàn toàn layer màu xanh khi bấm trên mobile */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -109,10 +109,11 @@
         .tab-content {
             display: none;
             flex: 1;
+            flex-direction: column;
         }
 
         .tab-content.active {
-            display: block;
+            display: flex;
         }
 
         .card {
@@ -176,7 +177,7 @@
         .chat-box {
             display: flex;
             flex-direction: column;
-            height: 220px; 
+            height: 200px; 
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 8px;
@@ -361,13 +362,13 @@
             flex-shrink: 0;
         }
 
-        /* GITHUB CONTRIBUTIONS GRID STYLING (Chỉ hiện ở Tab Lịch trình, ghim sát footer) */
+        /* GITHUB CONTRIBUTIONS GRID (Ô 4px, gap 1.2px) */
         .contrib-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 10px;
             border-radius: 12px;
-            margin-top: auto; /* Ghim sát xuống đáy trước footer */
+            margin-top: auto; 
             margin-bottom: 4px;
         }
 
@@ -375,7 +376,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .contrib-title {
@@ -388,10 +389,12 @@
             background: #FAFAFA;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-size: 10px;
             padding: 2px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--accent-dark);
             outline: none;
-            font-weight: 600;
+            cursor: pointer;
         }
 
         .contrib-layout {
@@ -403,15 +406,24 @@
         .contrib-days-label {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             font-size: 8px;
             color: var(--text-muted);
-            height: 91px; /* 7 hàng x 10px + khoảng cách */
-            padding-top: 14px; /* Chừa chỗ cho hàng số tuần phía trên */
+            padding-top: 18px; 
             text-align: right;
             flex-shrink: 0;
             font-weight: 600;
         }
+
+        .contrib-days-label span {
+            height: 8px;
+            line-height: 2px; 
+            box-sizing: border-box;
+        }
+        
+        .contrib-days-label span:nth-child(1) { height: 10.4px; }   
+        .contrib-days-label span:nth-child(2) { height: 10.4px; }    
+        .contrib-days-label span:nth-child(3) { height: 10.4px; }    
+        .contrib-days-label span:nth-child(4) { height: 5.2px; }   
 
         .contrib-main-content {
             flex: 1;
@@ -420,36 +432,41 @@
         }
 
         .contrib-main-content::-webkit-scrollbar {
-            height: 3px;
+            display: none; 
         }
 
-        .contrib-main-content::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 3px;
-        }
-
-        .contrib-weeks-header {
-            display: grid;
-            grid-auto-flow: column;
-            gap: 3px;
-            font-size: 7px;
+        .contrib-months-header {
+            display: flex;
+            height: 14px;
+            font-size: 9px;
             color: var(--text-muted);
-            margin-bottom: 2px;
-            height: 12px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .contrib-month-label {
+            flex: 1;
+            text-align: left;
+            white-space: nowrap;
         }
 
         .contrib-grid {
             display: grid;
-            grid-template-rows: repeat(7, 10px);
+            grid-template-rows: repeat(7, 4px);
             grid-auto-flow: column;
-            gap: 3px;
+            gap: 1.2px;
         }
 
         .contrib-cell {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
+            width: 4px;
+            height: 4px;
+            border-radius: 1px;
             background-color: #ebedf0;
+        }
+
+        .contrib-cell.out-of-year {
+            background-color: transparent !important;
+            visibility: hidden;
         }
 
         .contrib-cell[data-level="1"] { background-color: #9be9a8; }
@@ -457,7 +474,11 @@
         .contrib-cell[data-level="3"] { background-color: #30a14e; }
         .contrib-cell[data-level="4"] { background-color: #216e39; }
 
-        /* Modals & Bottom Nav */
+        .contrib-cell.is-first-of-month[data-level="1"] { background-color: #fca5a5; }
+        .contrib-cell.is-first-of-month[data-level="2"] { background-color: #f87171; }
+        .contrib-cell.is-first-of-month[data-level="3"] { background-color: #dc2626; }
+        .contrib-cell.is-first-of-month[data-level="4"] { background-color: #991b1b; }
+
         .modal-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -558,7 +579,7 @@
                         <span class="push-time" id="pushTimeDisplay">Bây giờ</span>
                     </div>
                     <div class="push-body" id="pushNotificationText">
-                        "Hoàn thành xuất sắc các mốc lịch trình hôm nay để bảng điểm danh xanh mướt nhé anh yêu! 😘"
+                        "Hoàn thành xuất sắc các mốc lịch trình hôm nay để bảng điểm danh sáng rực nhé anh yêu! 😘"
                     </div>
                 </div>
 
@@ -573,11 +594,13 @@
                     </div>
                 </div>
 
-                <!-- GITHUB CONTRIBUTIONS GRID (Chỉ hiển thị ở tab Lịch trình, ghim sát footer) -->
+                <!-- GITHUB CONTRIBUTIONS GRID THEO NĂM -->
                 <div class="contrib-card">
                     <div class="contrib-header">
                         <span class="contrib-title">AI Productivity Contributions</span>
-                        <select id="contribYearSelect" class="contrib-year-select" onchange="renderContributionsGrid()"></select>
+                        <select id="contribYearSelect" class="contrib-year-select" onchange="changeContribYear(this.value)">
+                            <!-- Dynamic populated years -->
+                        </select>
                     </div>
                     <div class="contrib-layout">
                         <div class="contrib-days-label">
@@ -586,8 +609,8 @@
                             <span>Thu</span>
                             <span>Sat</span>
                         </div>
-                        <div class="contrib-main-content">
-                            <div class="contrib-weeks-header" id="contribWeeksHeader"></div>
+                        <div class="contrib-main-content" id="contribMainScroll">
+                            <div class="contrib-months-header" id="contribMonthsHeader"></div>
                             <div class="contrib-grid" id="contribGridContainer"></div>
                         </div>
                     </div>
@@ -701,8 +724,8 @@
             document.getElementById('pushNotificationText').innerHTML = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
         }
 
-        // Khởi tạo bộ nhớ riêng biệt cho Contributions (Không bị xóa khi reset hệ thống)
         let contributionsMatrix = JSON.parse(localStorage.getItem('fmft_contributions_persistent_v1')) || {};
+        let selectedYear = todayObj.getFullYear();
         
         let apiKey = localStorage.getItem('fmft_apikey_v16') || '';
         let state = JSON.parse(localStorage.getItem('fmft_dynamic_state_v16')) || {
@@ -721,11 +744,11 @@
         let selectedTodoIndex = null;
         if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
 
-        initYearSelect();
         renderTodoList();
         renderTimeline();
         renderChatHistory();
-        renderContributionsGrid();
+        initYearSelector();
+        renderContributionsGrid(selectedYear);
 
         function saveState() {
             localStorage.setItem('fmft_dynamic_state_v16', JSON.stringify(state));
@@ -757,19 +780,6 @@
             saveContributions();
         }
 
-        function initYearSelect() {
-            const select = document.getElementById('contribYearSelect');
-            select.innerHTML = '';
-            const currentYear = new Date().getFullYear();
-            // Cho phép chọn năm hiện tại và các năm về trước (từ 2024 đến nay)
-            for (let y = currentYear; y >= 2024; y--) {
-                const opt = document.createElement('option');
-                opt.value = y;
-                opt.innerText = y;
-                select.appendChild(opt);
-            }
-        }
-
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
@@ -791,7 +801,6 @@
             }
         }
 
-        // RESET 10 GIÂY (Chỉ reset kế hoạch, việc làm, lịch trình... Contributions vẫn được bảo vệ)
         let resetTimer = null;
         let countdown = 10;
         const resetBtn = document.getElementById('resetBtn');
@@ -808,7 +817,6 @@
                     clearInterval(resetTimer);
                     localStorage.removeItem('fmft_dynamic_state_v16');
                     localStorage.removeItem('fmft_apikey_v16');
-                    // Lưu ý: Không xóa 'fmft_contributions_persistent_v1' để giữ lại lịch sử báo cáo
                     alert('Đã reset hệ thống chiến lược! Lịch sử Contributions vẫn được giữ nguyên vẹn.');
                     location.reload();
                 }
@@ -881,7 +889,7 @@
                 </div>`;
             });
             updateTodayMatrix();
-            renderContributionsGrid();
+            renderContributionsGrid(selectedYear);
         }
 
         function toggleSlotCheck(idx) {
@@ -901,41 +909,181 @@
             saveState(); renderTimeline(); tInput.value = ''; dInput.value = '';
         }
 
-        function renderContributionsGrid() {
-            const gridContainer = document.getElementById('contribGridContainer');
-            const weeksHeader = document.getElementById('contribWeeksHeader');
-            gridContainer.innerHTML = '';
-            weeksHeader.innerHTML = '';
-
-            const selectedYear = parseInt(document.getElementById('contribYearSelect').value);
-            const startDate = new Date(selectedYear, 0, 1);
-            const endDate = new Date(selectedYear, 11, 31);
+        function initYearSelector() {
+            const selectEl = document.getElementById('contribYearSelect');
+            let years = [todayObj.getFullYear()];
             
-            let curr = new Date(startDate);
-            curr.setDate(curr.getDate() - curr.getDay()); // Lùi về Chủ Nhật đầu tiên
+            Object.keys(contributionsMatrix).forEach(dateStr => {
+                const y = parseInt(dateStr.split('-')[0]);
+                if (!years.includes(y)) years.push(y);
+            });
 
-            let weekCount = 0;
-            while (curr <= endDate || curr.getDay() !== 0) {
-                if (curr.getDay() === 0) {
-                    weekCount++;
-                    // Đánh dấu số tuần phía trên (hiện mỗi 4 tuần hoặc tuần đầu)
-                    const wSpan = document.createElement('div');
-                    if (weekCount === 1 || weekCount % 4 === 0) {
-                        wSpan.innerText = weekCount;
+            years.sort((a, b) => b - a);
+            selectEl.innerHTML = '';
+            years.forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.innerText = y;
+                if (y === selectedYear) opt.selected = true;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        function changeContribYear(val) {
+            selectedYear = parseInt(val);
+            renderContributionsGrid(selectedYear);
+        }
+        
+        // 1. XIN PHÉP VÀ KÍCH HOẠT THÔNG BẢO ĐẨY (WEB PUSH / NOTIFICATIONS)
+        async function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                alert("Trình duyệt của anh không hỗ trợ thông báo đẩy trực tiếp!");
+                return;
+            }
+            
+            const permission = await Notification.requestPermission();
+            if (permission === "granted") {
+                new Notification("💖 Gấu Yêu AI đã sẵn sàng!", {
+                    body: "Từ giờ em sẽ luôn đồng hành và nhắc nhở lịch trình đúng giờ cho anh yêu nhé! 😘",
+                    icon: "https://cdn-icons-png.flaticon.com/512/2583/2583344.png"
+                });
+            } else {
+                alert("Anh chưa cấp quyền thông báo, hãy bật lại trong cài đặt trình duyệt để Gấu nhắc việc nhé!");
+            }
+        }
+
+        // 2. HỆ THỐNG QUÉT LỊCH VÀ NHẮC NHỞ TỰ ĐỘNG (BACKGROUND CHIEF)
+        function checkScheduleAlerts() {
+            const now = new Date();
+            const currentHours = now.getHours();
+            const currentMinutes = now.getMinutes();
+            const currentTimeStr = `${String(currentHours).padStart(2, '0')}:${String(currentMinutes).padStart(2, '0')}`;
+
+            // Quét qua danh sách lịch trình xem có mốc nào sắp đến (cách đúng 5 phút)
+            state.scheduleList.forEach(slot => {
+                // Định dạng time dạng "15:00 - 16:00" hoặc "16:00"
+                const parts = slot.time.split('-');
+                if (parts.length > 0) {
+                    const startTime = parts[0].trim(); // Lấy giờ bắt đầu VD: "16:00"
+                    const [startH, startM] = startTime.split(':').map(Number);
+                    
+                    if (!isNaN(startH) && !isNaN(startM)) {
+                        // Tính số phút chênh lệch
+                        const targetTotalMinutes = startH * 60 + startM;
+                        const currentTotalMinutes = currentHours * 60 + currentMinutes;
+                        const diffMinutes = targetTotalMinutes - currentTotalMinutes;
+
+                        // Nếu đúng còn lại 5 phút nữa đến giờ thực hiện task!
+                        if (diffMinutes === 5 && !slot.notified) {
+                            slot.notified = true; // Đánh dấu đã báo để không lặp lại
+                            saveState();
+
+                            const loveMessages = [
+                                `Anh yêu ơi, còn 5 phút nữa đến giờ '${slot.desc}' rồi! Anh chuẩn bị nhé, cố lên cho kịp nha! ❤️`,
+                                `Chỉ còn 5 phút nữa là bắt đầu '${slot.desc}' nè anh yêu ơi. Hít một hơi thật sâu và sẵn sàng năng lượng nhé! ✨`,
+                                `Yêu thương bản thân mình tí nè, chuẩn bị 5 phút nữa mình chuyển sang '${slot.desc}' nha anh! 💖`
+                            ];
+                            const randomMsg = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+
+                            // Bắn thông báo đẩy ra màn hình (ngay cả khi thoát app nếu PWA active)
+                            if (Notification.permission === "granted") {
+                                navigator.serviceWorker ? 
+                                    navigator.serviceWorker.ready.then(reg => {
+                                        reg.showNotification("💖 Gấu Yêu AI Nhắc Nhở", {
+                                            body: randomMsg,
+                                            icon: "https://cdn-icons-png.flaticon.com/512/2583/2583344.png",
+                                            vibrate: [200, 100, 200]
+                                        });
+                                    }) : 
+                                    new Notification("💖 Gấu Yêu AI Nhắc Nhở", { body: randomMsg });
+                            }
+
+                            // Đồng thời hiện thị ngay trong UI của app
+                            document.getElementById('pushTimeDisplay').innerText = currentTimeStr;
+                            document.getElementById('pushNotificationText').innerText = `"${randomMsg}"`;
+                        }
                     }
-                    weeksHeader.appendChild(wSpan);
+                }
+            });
+        }
+
+        // Chạy bộ đếm kiểm tra mỗi phút một lần
+        setInterval(checkScheduleAlerts, 60000);
+
+        // RENDER ĐÚNG CHUẨN MÙNG 1 VÀ TỐI ƯU Ô 4px, GAP 1.2px
+        function renderContributionsGrid(year) {
+            const gridContainer = document.getElementById('contribGridContainer');
+            const monthsHeader = document.getElementById('contribMonthsHeader');
+            gridContainer.innerHTML = '';
+            monthsHeader.innerHTML = '';
+
+            const startDate = new Date(year, 0, 1);
+            const endDate = new Date(year, 11, 31);
+
+            let curr = new Date(startDate);
+            curr.setDate(curr.getDate() - curr.getDay()); // Lùi về Chủ Nhật đầu tuần
+
+            let colIndex = 0;
+            const monthMap = {}; 
+            const monthNamesEnglish = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            while (curr <= endDate || curr.getDay() !== 0) {
+                // Quét xem cột tuần này có chứa ngày mùng 1 của tháng nào không
+                for (let d = 0; d < 7; d++) {
+                    const checkDate = new Date(curr);
+                    checkDate.setDate(checkDate.getDate() + d);
+                    
+                    if (checkDate.getFullYear() === year && checkDate.getDate() === 1) {
+                        const m = checkDate.getMonth();
+                        if (monthMap[m] === undefined) {
+                            monthMap[m] = colIndex;
+                        }
+                    }
                 }
 
-                const dateKey = curr.toISOString().split('T')[0];
-                const level = contributionsMatrix[dateKey] || 0;
-                
-                const cell = document.createElement('div');
-                cell.className = 'contrib-cell';
-                if (level > 0) cell.setAttribute('data-level', level);
-                gridContainer.appendChild(cell);
+                // Vẽ 7 ô của cột
+                for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+                    const cellDate = new Date(curr);
+                    const cell = document.createElement('div');
+                    cell.className = 'contrib-cell';
 
-                curr.setDate(curr.getDate() + 1);
-                if (curr.getFullYear() > selectedYear && curr.getDay() === 0) break;
+                    if (cellDate.getFullYear() === year) {
+                        // Sửa lại đoạn tạo dateKey chuẩn local time trong hàm renderContributionsGrid:
+                        const yyyy = cellDate.getFullYear();
+                        const mm = String(cellDate.getMonth() + 1).padStart(2, '0');
+                        const dd = String(cellDate.getDate()).padStart(2, '0');
+                        const dateKey = `${yyyy}-${mm}-${dd}`;
+
+                        const level = contributionsMatrix[dateKey] || 0;
+
+                        if (level > 0) {
+                            cell.setAttribute('data-level', level);
+                        }
+
+                        const isFirstDay = (cellDate.getDate() === 1);
+                        if (isFirstDay) {
+                            cell.classList.add('is-first-of-month');
+                        }
+
+                        cell.title = `${dateKey}: Level ${level}${isFirstDay ? ` (Mùng 1 tháng ${cellDate.getMonth() + 1})` : ''}`;
+                    } else {
+                        cell.classList.add('out-of-year');
+                    }
+
+                    gridContainer.appendChild(cell);
+                    curr.setDate(curr.getDate() + 1);
+                }
+                colIndex++;
+                if (curr > endDate && curr.getDay() === 0) break;
+            }
+
+            // Tạo thanh tiêu đề tháng chuẩn flex phân bổ đều
+            for (let m = 0; m < 12; m++) {
+                const mSpan = document.createElement('div');
+                mSpan.className = 'contrib-month-label';
+                mSpan.innerText = monthNamesEnglish[m];
+                if (monthMap[m] === undefined && m === 0) monthMap[0] = 0;
+                monthsHeader.appendChild(mSpan);
             }
         }
 
