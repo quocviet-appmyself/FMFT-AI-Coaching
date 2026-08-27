@@ -16,6 +16,7 @@
             --accent-dark: #111111;
             --danger-color: #EF4444;
             --love-pink: #FF6584;
+            --success-color: #10B981;
         }
 
         * {
@@ -362,7 +363,6 @@
             flex-shrink: 0;
         }
 
-        /* GITHUB CONTRIBUTIONS GRID (Ô 4px, gap 1.2px) */
         .contrib-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -482,30 +482,99 @@
         .modal-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(2px);
+            background: rgba(15, 15, 15, 0.65);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 100;
+            animation: fadeInOverlay 0.25s ease-out forwards;
         }
         .modal-overlay.active { display: flex; }
-        .modal-content {
-            background: white;
-            width: 88%;
-            padding: 18px;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
+
+        .modal-content {
+            background: #FFFFFF;
+            width: 90%;
+            max-width: 350px;
+            padding: 22px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(229, 229, 229, 0.8);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.18), 0 0 1px rgba(0,0,0,0.1);
+            transform: translateY(10px) scale(0.96);
+            animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUpModal {
+            to {
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        #toastContainer {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 380px;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .custom-toast {
+            background: rgba(26, 26, 26, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+            transform: translateY(-20px);
+            opacity: 0;
+            animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .custom-toast.error { border-left: 4px solid var(--danger-color); }
+        .custom-toast.success { border-left: 4px solid var(--success-color); }
+        .custom-toast.warning { border-left: 4px solid var(--accent-gold); }
+
+        @keyframes toastIn {
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .toast-icon { font-size: 16px; flex-shrink: 0; }
+        .toast-body { flex: 1; font-size: 11px; line-height: 1.35; font-weight: 500; }
+        .toast-title { font-weight: 700; margin-bottom: 2px; font-size: 11.5px; }
 
         .quick-tag-btn {
             background: #F4F4F4;
             border: 1px solid var(--border-color);
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 5px 10px;
+            border-radius: 8px;
             font-size: 10px;
+            font-weight: 500;
             cursor: pointer;
             color: var(--text-main);
+            transition: all 0.2s;
+        }
+        .quick-tag-btn:hover {
+            background: var(--accent-dark);
+            color: #fff;
+            border-color: var(--accent-dark);
         }
 
         nav.bottom-nav {
@@ -556,21 +625,20 @@
 </head>
 <body>
 
-    <div class="mobile-container">
-        <!-- Header -->
+    <div class="mobile-container" onclick="recordActivity()" onmousemove="recordActivity()" onkeydown="recordActivity()">
+        <div id="toastContainer"></div>
+
         <header>
             <div class="logo">FMFT AI <span>OS</span></div>
             <div class="header-icons">
-                <button class="icon-btn" onclick="requestNotificationPermission()" title="Xin quyền trên giao diện">⏏</button>
-                <button class="icon-btn" onclick="triggerSmartNotification()" title="Gấu yêu tương tác">💟</button>
+                <button class="icon-btn" onclick="requestNotificationPermission()" title="Bật thông báo">⏏</button>
+                <button class="icon-btn" onclick="triggerSmartNotification()" title="Em yêu AI">💟</button>
                 <button class="icon-btn" onclick="openSettingsModal()">⚙️</button>
             </div>
         </header>
 
-        <!-- MAIN SCROLL AREA -->
         <div class="main-scroll-area">
             
-            <!-- TAB 1: LỊCH TRÌNH HÔM NAY -->
             <div id="tab-schedule" class="tab-content active">
                 <div class="daily-greeting" id="dateStringDisplay">Hôm nay: Lộ trình thông minh!</div>
                 
@@ -595,12 +663,10 @@
                     </div>
                 </div>
 
-                <!-- GITHUB CONTRIBUTIONS GRID THEO NĂM -->
                 <div class="contrib-card">
                     <div class="contrib-header">
                         <span class="contrib-title">AI Productivity Contributions</span>
                         <select id="contribYearSelect" class="contrib-year-select" onchange="changeContribYear(this.value)">
-                            <!-- Dynamic populated years -->
                         </select>
                     </div>
                     <div class="contrib-layout">
@@ -618,12 +684,11 @@
                 </div>
             </div>
 
-            <!-- TAB 2: KẾ HOẠCH -->
             <div id="tab-strategy" class="tab-content">
-                <div class="badge-status">🔒 FMFT Private AI & Workflow</div>
+                <div class="badge-status">🔒 Thầm lặng mà hiệu quả</div>
                 
                 <div class="card" style="margin-bottom: 10px;">
-                    <h3>Góc Tâm Sự & Chiến Lược</h3>
+                    <h3>NGHỊ SỰ</h3>
                     <div class="chat-box">
                         <div class="chat-messages" id="privateChatMessages">
                             <div class="message ai">
@@ -637,7 +702,7 @@
                     </div>
                 </div>
 
-                <div class="sub-section-title">Việc Cần Làm (Ý đại quát)</div>
+                <div class="sub-section-title">VIỆC CẦN LÀM</div>
                 <div class="card" style="margin-bottom: 6px;">
                     <div id="dynamicTodoList"></div>
                     <div style="display: flex; gap: 6px; margin-top: 6px;">
@@ -649,55 +714,80 @@
 
         </div>
 
-        <!-- MODAL DUYỆT CHUYỂN VIỆC SANG LỊCH TRÌNH -->
-        <div class="modal-overlay" id="convertModal">
+        <div class="modal-overlay modal-dismiss" id="securityModal" style="z-index: 200;">
+            <div class="modal-content" style="text-align: center;">
+                <div style="width: 44px; height: 44px; background: rgba(212, 175, 55, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
+                    <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: var(--accent-gold);"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                </div>
+                <h3 id="secTitle" style="font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text-main);">🔐 Không phận sự miễn vào!</h3>
+                <p id="secDesc" style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">Bấm đại đại đi</p>
+                
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px;">
+                    <input type="password" id="pinCodeBox" maxlength="4" placeholder="••••" style="width: 140px; text-align: center; font-size: 20px; letter-spacing: 6px; padding: 8px; border: 1px solid var(--border-color); border-radius: 10px; outline: none; background: #FAFAFA; transition: border-color 0.2s;" onfocus="this.style.borderColor='#111'" onblur="this.style.borderColor='#E5E5E5'">
+                    
+                    <button onclick="verifyFingerprint()" title="Quét vân tay" style="background: transparent; border: 1px solid var(--border-color); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='#F4F4F4'" onmouseout="this.style.background='transparent'">
+                        <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: var(--accent-dark);">
+                            <path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 13.9 3 12 3c-1.9 0-3.66.42-5.58 1.41-.15.08-.33.05-.45-.07-.12-.12-.15-.31-.07-.46C7.94 2.8 9.87 2.3 12 2.3s4.06.5 6.1 1.58c.15.08.21.27.13.43-.05.1-.15.16-.25.16zM12 6c-3.31 0-6 2.69-6 6 0 .55.45 1 1 1s1-.45 1-1c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .55.45 1 1 1s1-.45 1-1c0-3.31-2.69-6-6-6zm0 4c-1.1 0-2 .9-2 2 0 .55.45 1 1 1s1-.45 1-1c-.17 0-.33-.15-.33-.33 0-.17.15-.33.33-.33s.33.16.33.33c0 .55.45 1 1 1s1-.45 1-1c0-1.1-.9-2-2-2zm6.66-7.39c-.12-.12-.31-.15-.46-.07C16.14 2.76 14.15 2.3 12 2.3S7.86 2.76 5.8 2.54c-.15-.08-.34-.05-.46.07-.12.12-.15.31-.07.46C7.15 4.3 9.4 4.8 12 4.8s4.85-.5 6.73-1.73c.15-.12.18-.31.06-.46zM12 15c-1.66 0-3 1.34-3 3 0 .55.45 1 1 1s1-.45 1-1c0-.55.45-1 1-1s1 .45 1 1c0 1.66-1.34 3-3 3-1.66 0-3-1.34-3-3 0-.55-.45-1-1-1s-1 .45-1 1c0 2.76 2.24 5 5 5s5-2.24 5-5c0-1.66-1.34-3-3-3zm0-10c-3.87 0-7 3.13-7 7 0 .55.45 1 1 1s1-.45 1-1c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .55.45 1 1 1s1-.45 1-1c0-3.87-3.13-7-7-7z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div style="display: flex; justify-content: center;">
+                    <button onclick="verifyPinCode()" style="background: var(--accent-dark); color: #fff; border: none; padding: 10px 28px; border-radius: 10px; font-size: 11px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Vào</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay modal-dismiss" id="convertModal">
             <div class="modal-content">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <h3 style="font-size:13px; font-weight:700;">⚡ Duyệt việc vào Lịch trình</h3>
-                    <button onclick="closeConvertModal()" style="background:none; border:none; font-size:14px; cursor:pointer;">✕</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="font-size: 14px;">✨</span>
+                        <h3 style="font-size:13px; font-weight:700; color:var(--text-main);">Quy Hoạch Vào Lịch</h3>
+                    </div>
+                    <button onclick="closeConvertModal()" style="background:none; border:none; font-size:14px; cursor:pointer; color: var(--text-muted);">✕</button>
                 </div>
                 
                 <div style="margin-bottom: 10px;">
-                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Ý đại quát:</label>
-                    <input type="text" id="convertTaskPreview" readonly style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; background:#f9f9f9; font-weight:600;">
+                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">Ý đại quát:</label>
+                    <input type="text" id="convertTaskPreview" readonly style="width:100%; padding:8px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; background:#FAFAFA; font-weight:600; color:var(--text-main);">
                 </div>
 
-                <div style="margin-bottom: 12px;">
-                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Khung thời gian:</label>
-                    <input type="text" id="convertTimeFrameInput" placeholder="VD: 18:00 - 21:00" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none; margin-bottom:6px;">
+                <div style="margin-bottom: 14px;">
+                    <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px; font-weight:600;">Khung thời gian:</label>
+                    <input type="text" id="convertTimeFrameInput" placeholder="VD: 18:00 - 21:00" style="width:100%; padding:8px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none; margin-bottom:8px; background:#FAFAFA;">
                     
-                    <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                        <button class="quick-tag-btn" onclick="setQuickTime('Sáng (08:00 - 12:00)')">🌅 Sáng</button>
-                        <button class="quick-tag-btn" onclick="setQuickTime('Chiều (13:30 - 17:00)')">☀️ Chiều</button>
-                        <button class="quick-tag-btn" onclick="setQuickTime('Tối (18:00 - 21:00)')">🌙 Tối</button>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="quick-tag-btn" onclick="setQuickTime('08:00 - 12:00')">🌅 Sáng</button>
+                        <button class="quick-tag-btn" onclick="setQuickTime('13:30 - 17:00')">☀️ Chiều</button>
+                        <button class="quick-tag-btn" onclick="setQuickTime('18:00 - 21:00')">🌙 Tối</button>
                     </div>
                 </div>
 
-                <button onclick="confirmPushToSchedule()" style="width:100%; background:var(--accent-dark); color:var(--accent-gold); border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">Quy Hoạch Vào Lịch ➜</button>
+                <button onclick="confirmPushToSchedule()" style="width:100%; background:var(--accent-dark); color:var(--accent-gold); border:none; padding:10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">Đưa Vào Lịch Trình ➜</button>
             </div>
         </div>
 
-        <!-- SETTINGS MODAL -->
-        <div class="modal-overlay" id="settingsModal">
+        <div class="modal-overlay modal-dismiss" id="settingsModal">
             <div class="modal-content">
-                <h3 style="margin-bottom: 12px;">Cài đặt hệ thống</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h3 style="font-size:13px; font-weight:700; color:var(--text-main);">⚙️ Cài Đặt Hệ Thống</h3>
+                    <button onclick="closeSettingsModal()" style="background:none; border:none; font-size:14px; cursor:pointer; color: var(--text-muted);">✕</button>
+                </div>
                 <div style="display:flex; flex-direction:column; gap:10px;">
-                    <label style="font-size:11px; color:var(--text-muted);">Gemini API Key:</label>
-                    <input type="password" id="apiKeyInput" placeholder="Dán API Key..." style="padding:8px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;" onchange="saveApiKeyInput(this.value)">
-                    <button onclick="saveApiKey()" style="background:var(--accent-dark); color:#fff; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Lưu API Key</button>
+                    <label style="font-size:11px; color:var(--text-muted); font-weight:600;">Gemini API Key:</label>
+                    <input type="password" id="apiKeyInput" placeholder="Dán API Key..." style="padding:8px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none; background:#FAFAFA;" onchange="saveApiKeyInput(this.value)">
+                    <button onclick="saveApiKey()" style="background:var(--accent-dark); color:#fff; border:none; padding:9px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Lưu API Key</button>
                     
-                    <hr style="border:0; border-top:1px solid var(--border-color); margin: 6px 0;">
+                    <hr style="border:0; border-top:1px solid var(--border-color); margin: 4px 0;">
                     
                     <label style="font-size:11px; color:var(--danger-color); font-weight:600;">Vùng nguy hiểm:</label>
-                    <button id="resetBtn" style="background:var(--danger-color); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; user-select: none;">Nhấn và GIỮ TRONG 10 GIÂY để Reset</button>
-                    <div id="resetProgress" style="font-size:10px; color:var(--text-muted); text-align:center; font-weight:600;"></div>
-
-                    <button onclick="closeSettingsModal()" style="background:none; border:1px solid var(--border-color); padding:8px; border-radius:8px; font-size:11px; cursor:pointer; margin-top:6px;">Đóng</button>
+                    <button id="resetBtn" style="background:var(--danger-color); color:#fff; border:none; padding:9px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; user-select: none;">Reset Dữ Liệu (Giữ Mật Khẩu)</button>
+                    <div id="resetProgress" style="font-size:10px; color:var(--text-muted); text-align:center; font-weight:600; min-height: 14px;"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
         <nav class="bottom-nav">
             <button class="nav-item active" onclick="switchTab('schedule')" id="nav-schedule">
                 <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
@@ -736,12 +826,40 @@
                 timeEl.innerText = `${diffHours} giờ trước`;
             }
         }
-        setInterval(updateDynamicPushTime, 30000); // Cập nhật thời gian trôi qua mỗi 30 giây
+        setInterval(updateDynamicPushTime, 30000);
 
         function triggerSmartNotification() {
             notificationTimestamp = Date.now();
             document.getElementById('pushTimeDisplay').innerText = "Vừa xong";
             document.getElementById('pushNotificationText').innerHTML = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
+            showToast("💟 Em yêu AI", "Đã hét ra lửa", "success");
+        }
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            
+            let icon = '✨';
+            if (type === 'error') icon = '⚠️';
+            else if (type === 'warning') icon = '🔒';
+            else if (type === 'success') icon = '💖';
+
+            toast.innerHTML = `
+                <div class="toast-icon">${icon}</div>
+                <div class="toast-body">
+                    <div class="toast-title">${title}</div>
+                    <div>${message}</div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
         }
 
         let contributionsMatrix = JSON.parse(localStorage.getItem('fmft_contributions_persistent_v1')) || {};
@@ -769,6 +887,121 @@
         renderChatHistory();
         initYearSelector();
         renderContributionsGrid(selectedYear);
+
+        let lastInteractionTime = Date.now();
+        let isStrategyUnlocked = false;
+
+        function checkSecuritySetup() {
+            const savedPin = localStorage.getItem('fmft_security_pin');
+            if (!savedPin) {
+                document.getElementById('secTitle').innerText = "🔑 Đặt mã PIN bảo mật";
+                document.getElementById('secDesc').innerText = "Nhập 4 số PIN mới để bảo vệ không gian riêng tư nhé!";
+            } else {
+                document.getElementById('secTitle').innerText = "🔐 Không phận sự miễn vào!";
+                document.getElementById('secDesc').innerText = "Nhập mã PIN hoặc quét vân tay để tiếp tục.";
+            }
+        }
+
+        function verifyPinCode() {
+            const pinVal = document.getElementById('pinCodeBox').value.trim();
+            if (pinVal.length !== 4) {
+                showToast("Chưa đủ!", "Vui lòng nhập đúng 4 chữ số PIN nha.", "error");
+                return;
+            }
+
+            let savedPin = localStorage.getItem('fmft_security_pin');
+            if (!savedPin) {
+                localStorage.setItem('fmft_security_pin', pinVal);
+                showToast("Thành công", "Đã thiết lập mã PIN bảo mật!", "success");
+                unlockStrategyModule();
+            } else {
+                if (pinVal === savedPin) {
+                    showToast("Xịn đấy", "Mở khóa thành công!", "success");
+                    unlockStrategyModule();
+                } else {
+                    showToast("Sai rồi!", "Mã PIN không đúng, thử lại nhé.", "error");
+                }
+            }
+            document.getElementById('pinCodeBox').value = '';
+        }
+
+        async function verifyFingerprint() {
+            try {
+                if (!window.PublicKeyCredential) {
+                    showToast("Không hỗ trợ", "Trình duyệt không hỗ trợ xác thực sinh trắc học.", "warning");
+                    return;
+                }
+                const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!available) {
+                    showToast("Không khả dụng", "Thiết bị không có cảm biến vân tay.", "warning");
+                    return;
+                }
+
+                const publicKey = {
+                    challenge: new Uint8Array([21,31,105,74,115,44,88,105]),
+                    rp: { name: "FMFT AI OS" },
+                    user: {
+                        id: new Uint8Array(16),
+                        name: "user@fmft.os",
+                        displayName: "Quốc Việt"
+                    },
+                    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+                    timeout: 60000,
+                    attestation: "none"
+                };
+
+                await navigator.credentials.create({ publicKey });
+                localStorage.setItem('fmft_security_biometric', 'true');
+                showToast("Thành công", "Xác thực vân tay thành công!", "success");
+                unlockStrategyModule();
+            } catch (err) {
+                if (localStorage.getItem('fmft_security_biometric') === 'true') {
+                    showToast("Thành công", "Xác thực vân tay thành công!", "success");
+                    unlockStrategyModule();
+                } else {
+                    showToast("Lỗi", "Không thể xác thực vân tay.", "error");
+                }
+            }
+        }
+
+        function unlockStrategyModule() {
+            isStrategyUnlocked = true;
+            lastInteractionTime = Date.now();
+            document.getElementById('securityModal').classList.remove('active');
+            
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-strategy').classList.add('active');
+            document.getElementById('nav-strategy').classList.add('active');
+        }
+
+        function recordActivity() {
+            lastInteractionTime = Date.now();
+        }
+
+        setInterval(() => {
+            if (isStrategyUnlocked) {
+                const elapsed = Date.now() - lastInteractionTime;
+                if (elapsed > 300000) {
+                    isStrategyUnlocked = false;
+                }
+            }
+        }, 10000);
+
+        function switchTab(tabId) {
+            if (tabId === 'strategy') {
+                if (!isStrategyUnlocked) {
+                    checkSecuritySetup();
+                    document.getElementById('securityModal').classList.add('active');
+                    return;
+                }
+            }
+            
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById('nav-' + tabId).classList.add('active');
+        }
 
         function saveState() {
             localStorage.setItem('fmft_dynamic_state_v16', JSON.stringify(state));
@@ -800,13 +1033,6 @@
             saveContributions();
         }
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.getElementById('nav-' + tabId).classList.add('active');
-        }
-
         function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
         function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
 
@@ -816,7 +1042,7 @@
             if (val) {
                 apiKey = val;
                 localStorage.setItem('fmft_apikey_v16', apiKey);
-                alert('Đã lưu API Key thành công!');
+                showToast("Thành công", "Đã lưu API Key an toàn vào hệ thống!", "success");
                 closeSettingsModal();
             }
         }
@@ -835,9 +1061,16 @@
                     document.getElementById('resetProgress').innerText = `Đang giữ... còn ${countdown}s`;
                 } else {
                     clearInterval(resetTimer);
+                    const savedPin = localStorage.getItem('fmft_security_pin');
+                    const savedBio = localStorage.getItem('fmft_security_biometric');
+
                     localStorage.removeItem('fmft_dynamic_state_v16');
                     localStorage.removeItem('fmft_apikey_v16');
-                    alert('Đã reset hệ thống chiến lược! Lịch sử Contributions vẫn được giữ nguyên vẹn.');
+
+                    if(savedPin) localStorage.setItem('fmft_security_pin', savedPin);
+                    if(savedBio) localStorage.setItem('fmft_security_biometric', savedBio);
+
+                    showToast("Đã Reset Hệ Thống", "Dữ liệu được làm mới", "success");
                     location.reload();
                 }
             }, 1000);
@@ -895,6 +1128,7 @@
             const timeVal = document.getElementById('convertTimeFrameInput').value.trim() || "15:00 - 16:00";
             state.scheduleList.push({ time: timeVal, desc: task.text, checked: false });
             saveState(); renderTimeline(); closeConvertModal(); switchTab('schedule');
+            showToast("Thành công", "Đã quy hoạch việc cần làm vào lịch trình hôm nay!", "success");
         }
 
         function renderTimeline() {
@@ -954,25 +1188,20 @@
             renderContributionsGrid(selectedYear);
         }
         
-        // XIN PHÉP VÀ KÍCH HOẠT THÔNG BẢO ĐẨY RA MÀN HÌNH THỰC TẾ
         async function requestNotificationPermission() {
             if (!("Notification" in window)) {
-                alert("Trình duyệt của anh không hỗ trợ thông báo đẩy trực tiếp!");
+                showToast("Không hỗ trợ", "Trình duyệt không hỗ trợ thông báo", "warning");
                 return;
             }
             
             const permission = await Notification.requestPermission();
             if (permission === "granted") {
-                new Notification("💖 Gấu Yêu AI đã sẵn sàng!", {
-                    body: "Từ giờ em sẽ luôn đồng hành và nhắc nhở lịch trình đúng giờ cho anh yêu nhé! 😘",
-                    icon: "https://cdn-icons-png.flaticon.com/512/2583/2583344.png"
-                });
+                showToast("Tuyệt vời!", "Đã bật thông báo thành công!", "success");
             } else {
-                alert("Anh chưa cấp quyền thông báo, hãy bật lại trong cài đặt để Gấu nhắc việc nhé!");
+                showToast("Chưa cấp quyền", "Vui lòng cấp quyền thông báo để nhận nhắc nhở nhé.", "error");
             }
         }
 
-        // HỆ THỐNG QUÉT LỊCH VÀ ĐẨY THÔNG BẢO RA MÀN HÌNH ĐIỆN THOẠI TRƯỚC 5 PHÚT
         function checkScheduleAlerts() {
             const now = new Date();
             const currentHours = now.getHours();
@@ -1000,22 +1229,14 @@
                             ];
                             const randomMsg = loveMessages[Math.floor(Math.random() * loveMessages.length)];
 
-                            // Bắn thông báo đẩy ra ngoài màn hình thiết bị
                             if (Notification.permission === "granted") {
-                                navigator.serviceWorker ? 
-                                    navigator.serviceWorker.ready.then(reg => {
-                                        reg.showNotification("💖 Gấu Yêu AI Nhắc Nhở", {
-                                            body: randomMsg,
-                                            icon: "https://cdn-icons-png.flaticon.com/512/2583/2583344.png",
-                                            vibrate: [200, 100, 200]
-                                        });
-                                    }) : 
-                                    new Notification("💖 Gấu Yêu AI Nhắc Nhở", { body: randomMsg });
+                                new Notification("💖 Em yêu AI", { body: randomMsg });
                             }
 
                             notificationTimestamp = Date.now();
                             document.getElementById('pushTimeDisplay').innerText = "Vừa xong";
                             document.getElementById('pushNotificationText').innerText = `"${randomMsg}"`;
+                            showToast("💖 Em yêu AI", randomMsg, "success");
                         }
                     }
                 }
@@ -1116,7 +1337,9 @@
 
             if (!apiKey) {
                 state.chatHistory.push({ role: 'ai', text: "Anh yêu ơi, hãy vào Cài đặt nhập API Key nhé!", id: Date.now() });
-                renderChatHistory(); return;
+                renderChatHistory();
+                showToast("Thiếu API Key", "Vui lòng cấu hình API Key trong mục Cài đặt.", "error");
+                return;
             }
 
             const loadingId = Date.now();
@@ -1147,6 +1370,14 @@
             if (!text) return '';
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
+
+        document.querySelectorAll('.modal-overlay.modal-dismiss').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
     </script>
 </body>
 </html>
