@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#111111">
+    <link rel="manifest" href="./manifest.webmanifest">
     <title>FMFT AI Coaching - Dynamic Living OS</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -210,15 +212,21 @@
             gap: 6px;
             padding-top: 6px;
             border-top: 1px solid var(--border-color);
+            align-items: flex-end;
         }
 
-        .chat-input-area input {
+        .chat-input-area textarea {
             flex: 1;
+            min-height: 36px;
+            max-height: 120px;
+            resize: vertical;
             padding: 7px 10px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             outline: none;
             font-size: 11px;
+            line-height: 1.4;
+            overflow-y: auto;
         }
 
         .chat-input-area button {
@@ -230,6 +238,20 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 11px;
+            height: 36px;
+        }
+
+        .approval-btn {
+            margin-top: 8px;
+            background: var(--accent-dark);
+            color: var(--accent-gold);
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            align-self: flex-start;
         }
 
         .sub-section-title {
@@ -689,7 +711,7 @@
                             </div>
                         </div>
                         <div class="chat-input-area">
-                            <input type="text" id="privateUserInput" placeholder="Nhập tâm sự hoặc mục tiêu mới..." onkeypress="handlePrivateKeyPress(event)">
+                            <textarea id="privateUserInput" placeholder="Nhập tâm sự hoặc mục tiêu mới..." rows="1" onkeydown="handlePrivateKeyPress(event)"></textarea>
                             <button onclick="sendPrivateMessage()">Gửi</button>
                         </div>
                     </div>
@@ -815,9 +837,44 @@
 
         function triggerSmartNotification() {
             notificationTimestamp = Date.now();
+            const message = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
             document.getElementById('pushTimeDisplay').innerText = "Vừa xong";
-            document.getElementById('pushNotificationText').innerText = smartContextualNotifications[Math.floor(Math.random() * smartContextualNotifications.length)];
+            document.getElementById('pushNotificationText').innerText = message;
+            showSystemNotification('💖 Gấu Yêu AI', message.replace(/"/g, ''));
             showToast("💟 Em yêu AI", "Đã gửi lời nhắc", "success");
+        }
+
+        function getLocalNotificationsPlugin() {
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+                return window.Capacitor.Plugins.LocalNotifications;
+            }
+            return null;
+        }
+
+        async function showSystemNotification(title, body) {
+            const plugin = getLocalNotificationsPlugin();
+            if (!plugin) return;
+
+            const cleanBody = String(body || '').replace(/\s+/g, ' ').trim() || 'Em nhớ anh nhé!';
+            try {
+                const permissionResult = await plugin.requestPermissions();
+                const isGranted = permissionResult?.display === 'granted' || permissionResult?.notifications?.display === 'granted';
+                if (!isGranted) return;
+
+                await plugin.schedule({
+                    notifications: [{
+                        id: Date.now() + Math.floor(Math.random() * 1000),
+                        title: title,
+                        body: cleanBody,
+                        schedule: { at: new Date(Date.now() + 1000) },
+                        sound: 'default',
+                        smallIcon: 'res://ic_stat_icon',
+                        largeIcon: 'res://ic_launcher'
+                    }]
+                });
+            } catch (err) {
+                console.warn('LocalNotifications schedule failed', err);
+            }
         }
 
         function showToast(title, message, type = 'success') {
@@ -867,6 +924,7 @@
         renderChatHistory();
         initYearSelector();
         renderContributionsGrid(selectedYear);
+        startRandomNotificationLoop();
 
         let isStrategyUnlocked = false;
 
@@ -1115,16 +1173,39 @@
         }
         
         async function requestNotificationPermission() {
-            if (!("Notification" in window)) {
-                showToast("Chưa hỗ trợ", "Trình duyệt không hỗ trợ Push.", "warning");
-                return;
+            const plugin = getLocalNotificationsPlugin();
+            if (!plugin) {
+                showToast("Cần Capacitor", "Thông báo native chỉ hoạt động khi app chạy trong Capacitor/Android native.", "warning");
+                return false;
             }
-            const perm = await Notification.requestPermission();
-            if (perm === "granted") {
-                showToast("Tuyệt vời", "Đã bật thông báo!", "success");
-            } else {
-                showToast("Thông báo", "Quyền thông báo chưa được cấp.", "warning");
+
+            try {
+                const permissionResult = await plugin.requestPermissions();
+                const isGranted = permissionResult?.display === 'granted' || permissionResult?.notifications?.display === 'granted';
+
+                if (isGranted) {
+                    showToast("Tuyệt vời", "Đã bật thông báo native cho điện thoại!", "success");
+                    showSystemNotification('💖 Gấu Yêu AI', 'Thông báo đã được kích hoạt. Em sẽ nhắc anh đúng lúc nhé!');
+                    return true;
+                }
+
+                showToast("Thông báo", "Quyền thông báo chưa được cấp. Hãy cấp quyền để nhận nhắc nhở từ Gấu Yêu AI.", "warning");
+                return false;
+            } catch (err) {
+                console.warn('LocalNotifications permission request failed', err);
+                showToast("Lỗi", "Không thể xin quyền thông báo native.", "error");
+                return false;
             }
+        }
+
+        function startRandomNotificationLoop() {
+            setInterval(() => {
+                if (!window.Capacitor || !window.Capacitor.Plugins || !window.Capacitor.Plugins.LocalNotifications) return;
+                const chance = Math.random();
+                if (chance < 0.22) {
+                    triggerSmartNotification();
+                }
+            }, 1000 * 60 * 20);
         }
 
         function renderContributionsGrid(year) {
@@ -1177,12 +1258,118 @@
             const chatMessages = document.getElementById('privateChatMessages');
             chatMessages.innerHTML = '';
             state.chatHistory.forEach(msg => {
-                chatMessages.innerHTML += `<div class="message ${msg.role}">${escapeHtml(msg.text).replace(/\n/g, '<br>')}</div>`;
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${msg.role}`;
+
+                const textEl = document.createElement('div');
+                textEl.innerHTML = escapeHtml(msg.text || '').replace(/\n/g, '<br>');
+                messageEl.appendChild(textEl);
+
+                if (msg.role === 'ai') {
+                    const approveBtn = document.createElement('button');
+                    approveBtn.className = 'approval-btn';
+                    approveBtn.textContent = 'Duyệt';
+                    approveBtn.onclick = () => approveAiProposal(msg.id);
+                    messageEl.appendChild(approveBtn);
+                }
+
+                chatMessages.appendChild(messageEl);
             });
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        function handlePrivateKeyPress(e) { if (e.key === 'Enter') sendPrivateMessage(); }
+        function handlePrivateKeyPress(e) {
+            const textarea = e.target;
+
+            if (e.key === 'Enter') {
+                if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const value = textarea.value;
+                    textarea.value = value.slice(0, start) + '\n' + value.slice(end);
+                    textarea.selectionStart = textarea.selectionEnd = start + 1;
+                    textarea.style.height = 'auto';
+                    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+                    return;
+                }
+
+                // Mobile-first behavior: Enter adds a newline, not send.
+                e.preventDefault();
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const value = textarea.value;
+                textarea.value = value.slice(0, start) + '\n' + value.slice(end);
+                textarea.selectionStart = textarea.selectionEnd = start + 1;
+                textarea.style.height = 'auto';
+                textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+                return;
+            }
+        }
+
+        function parseAiTaskList(rawText) {
+            const lines = rawText.split(/\n|\r\n/);
+            const tasks = [];
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+                const cleaned = trimmed.replace(/^[-*•]|^\d+[\.)]\s*/g, '').trim();
+                if (cleaned.length > 8 && !/^Duyệt$/i.test(cleaned)) {
+                    tasks.push(cleaned.replace(/\s+/g, ' '));
+                }
+            }
+
+            if (tasks.length === 0) {
+                const sentenceList = rawText
+                    .replace(/\s+/g, ' ')
+                    .split(/(?<=[.!?])\s+/)
+                    .map(s => s.trim())
+                    .filter(s => s.length > 12 && !/^Duyệt$/i.test(s));
+                sentenceList.slice(0, 5).forEach(item => tasks.push(item));
+            }
+
+            return tasks.slice(0, 5);
+        }
+
+        async function approveAiProposal(messageId) {
+            const aiMessage = state.chatHistory.filter(msg => msg.role === 'ai' && msg.id === messageId).slice(-1)[0];
+            if (!aiMessage) return;
+
+            let tasks = parseAiTaskList(aiMessage.text || '');
+            if (!tasks.length && apiKey) {
+                try {
+                    const prompt = `Từ nội dung sau, hãy suy ra 3-5 việc cần làm cụ thể, mấu chốt, trọng tâm để người dùng thực hiện nhằm đạt được mục tiêu. Chỉ trả về danh sách dạng số, mỗi mục 1 dòng, không cần giải thích thêm:\n\n${aiMessage.text}`;
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] })
+                    });
+                    const data = await response.json();
+                    const generated = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    tasks = parseAiTaskList(generated);
+                } catch (err) {}
+            }
+
+            if (!tasks.length) {
+                tasks = [
+                    'Xác định mục tiêu rõ ràng và ưu tiên hành động mang lại hiệu quả lớn nhất ngay hôm nay',
+                    'Phân chia công việc theo mức độ quan trọng, tập trung làm việc cốt lõi trước',
+                    'Theo dõi tiến độ, điều chỉnh phương pháp và duy trì nhịp làm việc đều đặn'
+                ];
+            }
+
+            tasks.forEach(task => {
+                const normalized = task.trim();
+                if (!normalized) return;
+                const exists = state.todoList.some(item => item.text.trim().toLowerCase() === normalized.toLowerCase());
+                if (!exists) state.todoList.unshift({ text: normalized });
+            });
+
+            saveState();
+            renderTodoList();
+            showToast('Duyệt sáng kiến', 'Đã đưa việc quan trọng vào Mục Việc Cần làm.', 'success');
+        }
 
         async function sendPrivateMessage() {
             const input = document.getElementById('privateUserInput');
@@ -1190,7 +1377,7 @@
             if (!text) return;
 
             state.chatHistory.push({ role: 'user', text: text, id: Date.now() });
-            input.value = ''; renderChatHistory();
+            input.value = ''; input.style.height = '36px'; renderChatHistory();
 
             if (!apiKey) {
                 state.chatHistory.push({ role: 'ai', text: "Anh yêu ơi, hãy dán Gemini API Key ở phần Cài đặt nhé!", id: Date.now() });
@@ -1209,7 +1396,7 @@
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Trả lời ngắn gọn, ấm áp: " + text }] }] })
+                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Bạn là AI Coaching tận tâm, ấm áp, thực tế, có thể dùng thông tin thời gian thực. Hãy tư vấn chi tiết, đề xuất phương án/giải pháp rõ ràng và mang tính thực thi. Khi đưa ra phương án, hãy kèm thêm một dòng 'Duyệt' ở cuối để người dùng xác nhận. Hãy trả lời theo cách thân mật, hướng tới mục tiêu của người dùng, không ngắn quá. Mục tiêu/điều kiện: " + text }] }] })
                 });
                 const data = await response.json();
                 if (data.candidates && data.candidates[0].content) {
