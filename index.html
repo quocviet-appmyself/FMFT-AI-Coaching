@@ -725,6 +725,7 @@
                         <input type="text" id="todoInputText" placeholder="Thêm việc cần làm đại ý..." style="flex:1; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; font-size:11px; outline:none;">
                         <button onclick="addManualTodo()" style="background:var(--accent-dark); color:#fff; border:none; padding:0 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer;">Thêm</button>
                     </div>
+                    <button id="buildScheduleBtn" onclick="buildDailySchedule()" style="width:100%; margin-top:8px; background:var(--accent-gold); color:var(--accent-dark); border:none; padding:9px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">AI xếp Schedule hôm nay</button>
                 </div>
             </div>
 
@@ -946,6 +947,7 @@
         };
 
         let selectedTodoIndex = null;
+        state.approvedStrategy = state.approvedStrategy || null;
         if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
 
         renderTodoList();
@@ -1298,7 +1300,8 @@
                 if (msg.role === 'ai') {
                     const approveBtn = document.createElement('button');
                     approveBtn.className = 'approval-btn';
-                    approveBtn.textContent = 'Duyệt';
+                    approveBtn.textContent = msg.approved ? 'Đã duyệt' : 'Duyệt';
+                    approveBtn.disabled = !!msg.approved;
                     approveBtn.onclick = () => approveAiProposal(msg.id);
                     messageEl.appendChild(approveBtn);
                 }
@@ -1329,37 +1332,31 @@
         }
 
         function parseAiTaskList(rawText) {
-            const lines = rawText.split(/\n|\r\n/);
+            const taskSectionMatch = rawText.match(/(?:^|\n)\s*(?:#+\s*)?(?:VIỆC CẦN LÀM|CÁC VIỆC CẦN LÀM|TASKS?)\s*:?[\s\S]*$/i);
+            const taskSection = taskSectionMatch ? taskSectionMatch[0] : '';
+            if (!taskSection) return [];
+
+            const lines = taskSection.split(/\n|\r\n/);
             const tasks = [];
             for (const line of lines) {
                 const trimmed = line.trim();
                 if (!trimmed) continue;
                 const cleaned = trimmed.replace(/^[-*•]|^\d+[\.)]\s*/g, '').trim();
-                if (cleaned.length > 8 && !/^Duyệt$/i.test(cleaned)) {
+                if (cleaned.length > 8 && !/^(?:VIỆC CẦN LÀM|CÁC VIỆC CẦN LÀM|TASKS?|DUYỆT)\s*:?[\s]*$/i.test(cleaned)) {
                     tasks.push(cleaned.replace(/\s+/g, ' '));
                 }
             }
-
-            if (tasks.length === 0) {
-                const sentenceList = rawText
-                    .replace(/\s+/g, ' ')
-                    .split(/(?<=[.!?])\s+/)
-                    .map(s => s.trim())
-                    .filter(s => s.length > 12 && !/^Duyệt$/i.test(s));
-                sentenceList.slice(0, 5).forEach(item => tasks.push(item));
-            }
-
             return tasks.slice(0, 5);
         }
 
         async function approveAiProposal(messageId) {
             const aiMessage = state.chatHistory.filter(msg => msg.role === 'ai' && msg.id === messageId).slice(-1)[0];
-            if (!aiMessage) return;
+            if (!aiMessage || aiMessage.approved) return;
 
             let tasks = parseAiTaskList(aiMessage.text || '');
             if (!tasks.length && apiKey) {
                 try {
-                    const prompt = `Từ nội dung sau, hãy suy ra 3-5 việc cần làm cụ thể, mấu chốt, trọng tâm để người dùng thực hiện nhằm đạt được mục tiêu. Chỉ trả về danh sách dạng số, mỗi mục 1 dòng, không cần giải thích thêm:\n\n${aiMessage.text}`;
+                    const prompt = `Bạn là trợ lý chuyển nghị sự thành kế hoạch hành động cho một người có xu hướng D trong DISC: trực diện, ưu tiên kết quả, ghét việc chung chung. Từ nội dung dưới đây, hãy tạo 3-5 việc làm cụ thể và độc lập. Mỗi việc phải bắt đầu bằng động từ, có đối tượng rõ ràng và có con số, thời lượng, tần suất hoặc mốc thời gian nếu phù hợp. Không chép lại câu tư vấn, không đưa lời giải thích, không dùng các việc mơ hồ như "cố gắng", "tập trung" hay "theo dõi tiến độ". Chỉ trả về đúng tiêu đề "VIỆC CẦN LÀM" và danh sách đánh số, mỗi mục một dòng.\n\nNội dung nghị sự:\n${aiMessage.text}`;
                     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
                     const response = await fetch(url, {
                         method: 'POST',
@@ -1374,9 +1371,9 @@
 
             if (!tasks.length) {
                 tasks = [
-                    'Xác định mục tiêu rõ ràng và ưu tiên hành động mang lại hiệu quả lớn nhất ngay hôm nay',
-                    'Phân chia công việc theo mức độ quan trọng, tập trung làm việc cốt lõi trước',
-                    'Theo dõi tiến độ, điều chỉnh phương pháp và duy trì nhịp làm việc đều đặn'
+                    'Chọn 1 mục tiêu ưu tiên và viết kết quả cần đạt trong hôm nay',
+                    'Chia mục tiêu thành 3 hành động cụ thể và đặt thời lượng cho từng hành động',
+                    'Đánh giá kết quả vào cuối ngày và chốt 1 việc tiếp theo cho ngày mai'
                 ];
             }
 
@@ -1387,9 +1384,85 @@
                 if (!exists) state.todoList.unshift({ text: normalized });
             });
 
+            aiMessage.approved = true;
+            state.approvedStrategy = {
+                messageId: messageId,
+                strategy: aiMessage.text,
+                approvedAt: new Date().toISOString()
+            };
             saveState();
             renderTodoList();
-            showToast('Duyệt sáng kiến', 'Đã đưa việc quan trọng vào Mục Việc Cần làm.', 'success');
+            renderChatHistory();
+            showToast('Duyệt sách lược', 'Đã tạo việc chính. Hãy kiểm duyệt danh sách trước khi xếp Schedule.', 'success');
+        }
+
+        function parseAiSchedule(rawText) {
+            const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) return [];
+
+            try {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (!Array.isArray(parsed)) return [];
+                return parsed
+                    .filter(item => item && typeof item.time === 'string' && typeof item.desc === 'string')
+                    .map(item => ({
+                        time: item.time.trim(),
+                        desc: item.desc.trim(),
+                        checked: false,
+                        source: 'ai'
+                    }))
+                    .filter(item => item.time && item.desc)
+                    .slice(0, 10);
+            } catch (err) {
+                return [];
+            }
+        }
+
+        async function buildDailySchedule() {
+            const button = document.getElementById('buildScheduleBtn');
+            const tasks = state.todoList.map(item => item.text.trim()).filter(Boolean);
+            if (!tasks.length) {
+                showToast('Chưa có việc chính', 'Hãy duyệt một sách lược hoặc thêm việc vào danh sách trước.', 'warning');
+                return;
+            }
+            if (!apiKey) {
+                showToast('Thiếu API Key', 'Hãy dán Gemini API Key trong phần Cài đặt để AI xếp Schedule.', 'warning');
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'AI đang xếp lịch...';
+            const strategy = state.approvedStrategy?.strategy || 'Không có bản sách lược riêng; chỉ dùng danh sách việc đã được người dùng kiểm duyệt.';
+            const prompt = `Bạn là AI điều phối lịch sống thực tế cho người có xu hướng D trong DISC. Hãy biến sách lược và danh sách việc đã được người dùng kiểm duyệt thành Schedule cho HÔM NAY. Ưu tiên việc chính trước, sau đó chia việc phụ hỗ trợ, đồng thời chèn các sinh hoạt cơ bản hợp lý (ăn, nghỉ, vận động, chuẩn bị). Không xếp kín toàn bộ ngày; chừa khoảng đệm. Mỗi mục phải có khung giờ cụ thể và hành động bắt đầu bằng động từ. Không tạo mục chung chung. Trả về đúng một mảng JSON, không markdown, theo dạng: [{"time":"08:00 - 08:30","desc":"Ăn sáng và chuẩn bị"}]. Tối đa 10 mục, sắp xếp theo thời gian.\n\nSách lược đã duyệt:\n${strategy}\n\nViệc chính đã kiểm duyệt:\n${tasks.map((task, index) => `${index + 1}. ${task}`).join('\n')}`;
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                        tools: [{ google_search: {} }]
+                    })
+                });
+                const data = await response.json();
+                const generated = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const generatedSlots = parseAiSchedule(generated);
+                if (!generatedSlots.length) throw new Error('AI returned no schedule');
+
+                state.scheduleList = state.scheduleList.filter(slot => slot.source !== 'ai');
+                state.scheduleList.push(...generatedSlots);
+                saveState();
+                renderTimeline();
+                switchTab('schedule');
+                showToast('Đã xếp Schedule', 'AI đã phân chia việc chính, việc phụ và sinh hoạt cho hôm nay.', 'success');
+            } catch (err) {
+                console.warn('AI schedule generation failed', err);
+                showToast('Chưa xếp được lịch', 'Không nhận được Schedule hợp lệ từ AI. Hãy thử lại.', 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'AI xếp Schedule hôm nay';
+            }
         }
 
         async function sendPrivateMessage() {
@@ -1417,7 +1490,10 @@
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Bạn là AI Coaching tận tâm, ấm áp, thực tế, có thể dùng thông tin thời gian thực. Hãy tư vấn chi tiết, đề xuất phương án/giải pháp rõ ràng và mang tính thực thi. Khi đưa ra phương án, hãy kèm thêm một dòng 'Duyệt' ở cuối để người dùng xác nhận. Hãy trả lời theo cách thân mật, hướng tới mục tiêu của người dùng, không ngắn quá. Mục tiêu/điều kiện: " + text }] }] })
+                    body: JSON.stringify({
+                        contents: [{ role: "user", parts: [{ text: "Bạn là AI Coaching thực tế, đang tư vấn cho người có xu hướng D trong DISC: nói thẳng, nhanh, trọng tâm, hướng kết quả và quyền chủ động. Hãy trả lời theo cấu trúc bắt buộc sau: (1) MỤC TIÊU ƯU TIÊN: nêu một kết quả chính; (2) LỘ TRÌNH: chia thành các giai đoạn nối tiếp, ghi rõ việc tập trung trước, thời lượng/tần suất và điều kiện chuyển sang giai đoạn sau; (3) ĐIỂM QUYẾT ĐỊNH: nêu thứ tự ưu tiên và việc cần bỏ qua; (4) VIỆC CẦN LÀM: tạo 3-5 hành động độc lập, bắt đầu bằng động từ, có đối tượng rõ ràng và con số, thời lượng, tần suất hoặc mốc thời gian. Phần VIỆC CẦN LÀM phải là việc có thể bắt tay làm ngay, không lặp lại lời tư vấn và không dùng câu chung chung như 'tập trung', 'cố gắng', 'theo dõi tiến độ'. Cuối cùng ghi đúng một dòng 'Duyệt'. Khi cần thông tin mới, hãy tra cứu internet và phân biệt rõ dữ kiện với suy luận. Hãy tư vấn thân mật nhưng ngắn gọn, quyết đoán. Mục tiêu/điều kiện: " + text }] }],
+                        tools: [{ google_search: {} }]
+                    })
                 });
                 const data = await response.json();
                 if (data.candidates && data.candidates[0].content) {
