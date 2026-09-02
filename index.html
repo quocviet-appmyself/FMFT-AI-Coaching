@@ -1331,6 +1331,66 @@
             }
         }
 
+        let isVietnameseComposition = false;
+
+        function convertTelexInput(input) {
+            if (isVietnameseComposition || !input || input.isComposing) return;
+
+            const originalValue = input.value;
+            let convertedValue = originalValue
+                .replace(/aa/g, 'â')
+                .replace(/AA/g, 'Â')
+                .replace(/dd/g, 'đ')
+                .replace(/DD/g, 'Đ')
+                .replace(/ee/g, 'ê')
+                .replace(/EE/g, 'Ê')
+                .replace(/oo/g, 'ô')
+                .replace(/OO/g, 'Ô')
+                .replace(/uw/g, 'ư')
+                .replace(/UW/g, 'Ư')
+                .replace(/ow/g, 'ơ')
+                .replace(/OW/g, 'Ơ');
+
+            const toneMap = {
+                a: ['á', 'à', 'ả', 'ã', 'ạ'], A: ['Á', 'À', 'Ả', 'Ã', 'Ạ'],
+                â: ['ấ', 'ầ', 'ẩ', 'ẫ', 'ậ'], Â: ['Ấ', 'Ầ', 'Ẩ', 'Ẫ', 'Ậ'],
+                e: ['é', 'è', 'ẻ', 'ẽ', 'ẹ'], E: ['É', 'È', 'Ẻ', 'Ẽ', 'Ẹ'],
+                ê: ['ế', 'ề', 'ể', 'ễ', 'ệ'], Ê: ['Ế', 'Ề', 'Ể', 'Ễ', 'Ệ'],
+                i: ['í', 'ì', 'ỉ', 'ĩ', 'ị'], I: ['Í', 'Ì', 'Ỉ', 'Ĩ', 'Ị'],
+                o: ['ó', 'ò', 'ỏ', 'õ', 'ọ'], O: ['Ó', 'Ò', 'Ỏ', 'Õ', 'Ọ'],
+                ô: ['ố', 'ồ', 'ổ', 'ỗ', 'ộ'], Ô: ['Ố', 'Ồ', 'Ổ', 'Ỗ', 'Ộ'],
+                ơ: ['ớ', 'ờ', 'ở', 'ỡ', 'ợ'], Ơ: ['Ớ', 'Ờ', 'Ở', 'Ỡ', 'Ợ'],
+                u: ['ú', 'ù', 'ủ', 'ũ', 'ụ'], U: ['Ú', 'Ù', 'Ủ', 'Ũ', 'Ụ'],
+                ư: ['ứ', 'ừ', 'ử', 'ữ', 'ự'], Ư: ['Ứ', 'Ừ', 'Ử', 'Ữ', 'Ự'],
+                y: ['ý', 'ỳ', 'ỷ', 'ỹ', 'ỵ'], Y: ['Ý', 'Ỳ', 'Ỷ', 'Ỹ', 'Ỵ']
+            };
+            convertedValue = convertedValue.replace(/([a-zA-ZâÂêÊôÔơƠưƯ])([sfrxj])$/u, (match, vowel, tone) => {
+                const toneIndex = { s: 0, f: 1, r: 2, x: 3, j: 4 }[tone];
+                return toneMap[vowel] ? toneMap[vowel][toneIndex] : match;
+            });
+            convertedValue = convertedValue.replace(/([a-zA-ZÂâÊêÔôƠơƯư])([SFRXJ])$/u, (match, vowel, tone) => {
+                const toneIndex = { S: 0, F: 1, R: 2, X: 3, J: 4 }[tone];
+                return toneMap[vowel] ? toneMap[vowel][toneIndex] : match;
+            });
+
+            if (convertedValue === originalValue) return;
+            const cursor = input.selectionStart;
+            const difference = originalValue.length - convertedValue.length;
+            input.value = convertedValue;
+            input.setSelectionRange(Math.max(0, cursor - difference), Math.max(0, cursor - difference));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        document.addEventListener('compositionstart', () => { isVietnameseComposition = true; }, true);
+        document.addEventListener('compositionend', event => {
+            isVietnameseComposition = false;
+            convertTelexInput(event.target);
+        }, true);
+        document.addEventListener('input', event => {
+            const input = event.target;
+            if (input.matches('input[type="text"], textarea')) convertTelexInput(input);
+        }, true);
+
         function parseAiTaskList(rawText) {
             const taskSectionMatch = rawText.match(/(?:^|\n)\s*(?:#+\s*)?(?:VIỆC CẦN LÀM|CÁC VIỆC CẦN LÀM|TASKS?)\s*:?[\s\S]*$/i);
             const taskSection = taskSectionMatch ? taskSectionMatch[0] : '';
@@ -1474,7 +1534,7 @@
             input.value = ''; input.style.height = '36px'; renderChatHistory();
 
             if (!apiKey) {
-                state.chatHistory.push({ role: 'ai', text: "Anh yêu ơi, hãy dán Gemini API Key ở phần Cài đặt nhé!", id: Date.now() });
+                state.chatHistory.push({ role: 'ai', text: "Anh chưa kết nối Gemini nên em chưa thể tư vấn theo dữ liệu thực tế. Hãy mở Cài đặt, nhập Gemini API Key rồi gửi lại điều anh đang muốn giải quyết nhé.", id: Date.now() });
                 renderChatHistory();
                 return;
             }
@@ -1484,25 +1544,37 @@
             renderChatHistory();
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-            let aiReply = "Đã lưu lại chia sẻ của anh!";
 
             try {
+                const conversation = state.chatHistory
+                    .filter(message => message.id !== loadingId && message.text !== 'Đang phản hồi...')
+                    .slice(-20)
+                    .map(message => ({
+                        role: message.role === 'ai' ? 'model' : 'user',
+                        parts: [{ text: message.text }]
+                    }));
+                const coachingInstruction = "Bạn là một người bạn đồng hành và cố vấn thực tế, có khả năng tư duy rộng, cập nhật thông tin mới khi cần. Hãy trò chuyện tự nhiên, lắng nghe kỹ điều người dùng đang tâm sự, hỏi lại tối đa một câu khi còn thiếu dữ kiện quan trọng, rồi đưa ra hướng giải quyết cụ thể và phù hợp hoàn cảnh. Đừng chỉ xác nhận hoặc thông báo đã lưu chia sẻ. Nếu người dùng đang rối, hãy giúp họ chốt một việc ưu tiên tiếp theo. Với mục tiêu dài hạn, hãy đưa ra chiến lược và lộ trình; chỉ thêm mục VIỆC CẦN LÀM ở cuối khi thật sự có hành động cụ thể. Nếu có mục này, mỗi việc phải bắt đầu bằng động từ và có thời hạn, số lượng hoặc tần suất khi phù hợp. Người dùng có xu hướng D trong DISC nên cần câu trả lời thẳng, rõ, có trọng tâm nhưng vẫn thân tình. Khi cần dữ liệu mới, hãy tra cứu internet và nói rõ đâu là dữ kiện, đâu là suy luận.";
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ role: "user", parts: [{ text: "Bạn là AI Coaching thực tế, đang tư vấn cho người có xu hướng D trong DISC: nói thẳng, nhanh, trọng tâm, hướng kết quả và quyền chủ động. Hãy trả lời theo cấu trúc bắt buộc sau: (1) MỤC TIÊU ƯU TIÊN: nêu một kết quả chính; (2) LỘ TRÌNH: chia thành các giai đoạn nối tiếp, ghi rõ việc tập trung trước, thời lượng/tần suất và điều kiện chuyển sang giai đoạn sau; (3) ĐIỂM QUYẾT ĐỊNH: nêu thứ tự ưu tiên và việc cần bỏ qua; (4) VIỆC CẦN LÀM: tạo 3-5 hành động độc lập, bắt đầu bằng động từ, có đối tượng rõ ràng và con số, thời lượng, tần suất hoặc mốc thời gian. Phần VIỆC CẦN LÀM phải là việc có thể bắt tay làm ngay, không lặp lại lời tư vấn và không dùng câu chung chung như 'tập trung', 'cố gắng', 'theo dõi tiến độ'. Cuối cùng ghi đúng một dòng 'Duyệt'. Khi cần thông tin mới, hãy tra cứu internet và phân biệt rõ dữ kiện với suy luận. Hãy tư vấn thân mật nhưng ngắn gọn, quyết đoán. Mục tiêu/điều kiện: " + text }] }],
+                        systemInstruction: { parts: [{ text: coachingInstruction }] },
+                        contents: conversation,
                         tools: [{ google_search: {} }]
                     })
                 });
                 const data = await response.json();
-                if (data.candidates && data.candidates[0].content) {
-                    aiReply = data.candidates[0].content.parts[0].text;
-                }
-            } catch (err) {}
+                if (!response.ok) throw new Error(data?.error?.message || `HTTP ${response.status}`);
+                const aiReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!aiReply) throw new Error('Gemini không trả về nội dung tư vấn');
+                state.chatHistory = state.chatHistory.filter(m => m.id !== loadingId);
+                state.chatHistory.push({ role: 'ai', text: aiReply, id: Date.now() });
+            } catch (err) {
+                console.warn('AI coaching request failed', err);
+                state.chatHistory = state.chatHistory.filter(m => m.id !== loadingId);
+                state.chatHistory.push({ role: 'ai', text: `Em chưa nhận được phản hồi từ Gemini (${err.message}). Anh kiểm tra API Key/kết nối mạng rồi gửi lại nhé.`, id: Date.now() });
+            }
 
-            state.chatHistory = state.chatHistory.filter(m => m.id !== loadingId);
-            state.chatHistory.push({ role: 'ai', text: aiReply, id: Date.now() });
             saveState(); renderChatHistory();
         }
 
