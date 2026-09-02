@@ -827,6 +827,15 @@
 
         let notificationTimestamp = Date.now();
 
+        function nextNotificationId() {
+            const maxJavaInt = 2147483647;
+            let currentId = parseInt(localStorage.getItem('fmft_notification_id') || '0', 10);
+            if (!Number.isInteger(currentId) || currentId < 0 || currentId >= maxJavaInt) currentId = 0;
+            currentId += 1;
+            localStorage.setItem('fmft_notification_id', String(currentId));
+            return currentId;
+        }
+
         function updateDynamicPushTime() {
             const diffMs = Date.now() - notificationTimestamp;
             const diffMins = Math.floor(diffMs / 60000);
@@ -956,7 +965,7 @@
                     }
                 }
 
-                const notificationId = Date.now() + Math.floor(Math.random() * 1000);
+                const notificationId = nextNotificationId();
                 await plugin.schedule({
                     notifications: [{
                         id: notificationId,
