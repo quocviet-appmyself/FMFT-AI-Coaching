@@ -847,17 +847,70 @@
         }
 
         function getLocalNotificationsPlugin() {
-            const modules = window.Capacitor && window.Capacitor.Plugins ? window.Capacitor.Plugins : null;
-            if (modules && modules.LocalNotifications) return modules.LocalNotifications;
-            if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-                return window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications ? window.Capacitor.Plugins.LocalNotifications : null;
+            return window.Capacitor?.Plugins?.LocalNotifications || null;
+        }
+
+        function getPushNotificationsPlugin() {
+            return window.Capacitor?.Plugins?.PushNotifications || null;
+        }
+
+        let pushListenersInitialized = false;
+        let pushRegistrationReceived = false;
+
+        async function initializePushNotifications() {
+            const plugin = getPushNotificationsPlugin();
+            if (!plugin || pushListenersInitialized) return;
+
+            pushListenersInitialized = true;
+            await plugin.addListener('registration', token => {
+                pushRegistrationReceived = true;
+                localStorage.setItem('fmft_fcm_token', token.value);
+                console.log('FCM registration token received');
+                showToast('Push đã sẵn sàng', 'Thiết bị đã nhận được mã FCM từ Firebase.', 'success');
+            });
+            await plugin.addListener('registrationError', error => {
+                console.warn('FCM registration failed', error);
+                showToast('Push chưa sẵn sàng', 'Firebase chưa cấp được token cho thiết bị này.', 'warning');
+            });
+            await plugin.addListener('pushNotificationReceived', notification => {
+                const title = notification.title || 'FMFT AI';
+                const body = notification.body || 'Bạn có thông báo mới.';
+                document.getElementById('pushTimeDisplay').innerText = 'Vừa xong';
+                document.getElementById('pushNotificationText').innerText = body;
+                showToast(title, body, 'success');
+            });
+            await plugin.addListener('pushNotificationActionPerformed', action => {
+                if (action.notification?.data?.tab === 'strategy') switchTab('strategy');
+            });
+        }
+
+        async function registerPushNotifications() {
+            const plugin = getPushNotificationsPlugin();
+            if (!plugin) return false;
+
+            try {
+                await initializePushNotifications();
+                let permissionResult = await plugin.checkPermissions();
+                if (permissionResult.receive !== 'granted') permissionResult = await plugin.requestPermissions();
+                if (permissionResult.receive !== 'granted') {
+                    showToast('Push bị tắt', 'Hãy bật quyền thông báo cho FMFT trong Cài đặt Android.', 'warning');
+                    return false;
+                }
+                await plugin.register();
+                if (!pushRegistrationReceived) {
+                    showToast('Đang đăng ký Push', 'Firebase đang cấp mã thiết bị; thử lại sau vài giây nếu chưa nhận được.', 'warning');
+                }
+                return true;
+            } catch (err) {
+                console.warn('Push Notifications registration failed', err);
+                showToast('Push chưa sẵn sàng', 'Cần cấu hình Firebase Cloud Messaging cho Android.', 'warning');
+                return false;
             }
-            return null;
         }
 
         async function ensureNotificationChannel() {
             const plugin = getLocalNotificationsPlugin();
-            if (!plugin) return;
+            if (!plugin || !plugin.createChannel) return false;
 
             try {
                 await plugin.createChannel({
@@ -870,22 +923,38 @@
                     lights: true,
                     vibration: true
                 });
+                return true;
             } catch (err) {
-                console.warn('Notification channel creation skipped', err);
+                console.warn('Notification channel creation failed', err);
+                return false;
             }
         }
 
         async function showSystemNotification(title, body) {
             const plugin = getLocalNotificationsPlugin();
-            if (!plugin) return;
+            if (!plugin) {
+                showToast('Chưa chạy bản Android', 'Bridge Local Notifications chỉ hoạt động trong bản Capacitor native.', 'warning');
+                return false;
+            }
 
             const cleanBody = String(body || '').replace(/\s+/g, ' ').trim() || 'Em nhớ anh nhé!';
             try {
                 await ensureNotificationChannel();
-
-                const permissionResult = await plugin.requestPermissions();
+                let permissionResult = await plugin.checkPermissions();
+                const notificationPermission = permissionResult?.display || permissionResult?.notifications?.display;
+                if (notificationPermission !== 'granted') permissionResult = await plugin.requestPermissions();
                 const isGranted = permissionResult?.display === 'granted' || permissionResult?.notifications?.display === 'granted';
-                if (!isGranted) return;
+                if (!isGranted) {
+                    showToast('Thông báo bị tắt', 'Hãy bật quyền thông báo cho FMFT trong Cài đặt Android.', 'warning');
+                    return false;
+                }
+
+                if (plugin.checkExactNotificationSetting) {
+                    const exactSetting = await plugin.checkExactNotificationSetting();
+                    if (exactSetting?.exact_alarm !== 'granted' && plugin.changeExactNotificationSetting) {
+                        await plugin.changeExactNotificationSetting();
+                    }
+                }
 
                 const notificationId = Date.now() + Math.floor(Math.random() * 1000);
                 await plugin.schedule({
@@ -902,8 +971,11 @@
                         largeIcon: 'ic_launcher'
                     }]
                 });
+                return true;
             } catch (err) {
                 console.warn('LocalNotifications schedule failed', err);
+                showToast('Không gửi được thông báo', err?.message || 'Android từ chối lịch thông báo.', 'error');
+                return false;
             }
         }
 
@@ -1211,6 +1283,7 @@
             }
 
             try {
+                await registerPushNotifications();
                 await ensureNotificationChannel();
                 const permissionResult = await plugin.requestPermissions();
                 const isGranted = permissionResult?.display === 'granted' || permissionResult?.notifications?.display === 'granted';
@@ -1525,6 +1598,18 @@
             }
         }
 
+        function explainGeminiError(response, data, error) {
+            const rawMessage = String(data?.error?.message || error?.message || '').toLowerCase();
+            if (response?.status === 429 || rawMessage.includes('quota') || rawMessage.includes('rate limit')) {
+                return 'Gemini đang hết hạn mức sử dụng của API Key này (quota/rate limit), không phải lỗi mạng hay sai API Key. Anh kiểm tra Usage/Billing hoặc dùng API Key/project khác rồi gửi lại nhé.';
+            }
+            if (response?.status === 401 || response?.status === 403 || rawMessage.includes('api key')) {
+                return 'Gemini từ chối API Key hoặc quyền truy cập model. Anh kiểm tra lại API Key, project và quyền Gemini API nhé.';
+            }
+            if (!response) return 'Không kết nối được Gemini. Anh kiểm tra internet rồi gửi lại nhé.';
+            return `Gemini chưa phản hồi được (${data?.error?.message || error?.message || `HTTP ${response.status}`}). Anh thử lại sau nhé.`;
+        }
+
         async function sendPrivateMessage() {
             const input = document.getElementById('privateUserInput');
             const text = input.value.trim();
@@ -1564,15 +1649,25 @@
                     })
                 });
                 const data = await response.json();
-                if (!response.ok) throw new Error(data?.error?.message || `HTTP ${response.status}`);
+                if (!response.ok) {
+                    const requestError = new Error(data?.error?.message || `HTTP ${response.status}`);
+                    requestError.response = response;
+                    requestError.data = data;
+                    throw requestError;
+                }
                 const aiReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!aiReply) throw new Error('Gemini không trả về nội dung tư vấn');
+                if (!aiReply) {
+                    const responseError = new Error('Gemini không trả về nội dung tư vấn');
+                    responseError.response = response;
+                    responseError.data = data;
+                    throw responseError;
+                }
                 state.chatHistory = state.chatHistory.filter(m => m.id !== loadingId);
                 state.chatHistory.push({ role: 'ai', text: aiReply, id: Date.now() });
             } catch (err) {
                 console.warn('AI coaching request failed', err);
                 state.chatHistory = state.chatHistory.filter(m => m.id !== loadingId);
-                state.chatHistory.push({ role: 'ai', text: `Em chưa nhận được phản hồi từ Gemini (${err.message}). Anh kiểm tra API Key/kết nối mạng rồi gửi lại nhé.`, id: Date.now() });
+                state.chatHistory.push({ role: 'ai', text: explainGeminiError(err.response, err.data, err), id: Date.now() });
             }
 
             saveState(); renderChatHistory();
